@@ -28,45 +28,76 @@ provider:
         - DELETE
 
 functions:
-  createTienda:
-    handler: create_tienda.handler
+  createOrder:
+    handler: create_order.handler
     events:
       - http:
-          path: /tienda/create
+          path: /pedidos/create
           method: post
-          cors: true  # Habilitado por cada evento
-          integration: lambda
+          cors: true  # CORS habilitado para este endpoint
 
-  fetchTienda:
-    handler: fetch_tienda.handler
+  getOrder:
+    handler: get_order.handler
     events:
       - http:
-          path: /tienda/fetch
+          path: /pedidos/get
           method: get
-          cors: true  # Habilitado por cada evento
-          integration: lambda
-    
-  getTienda:
-    handler: get_tienda.handler
+          cors: true  # CORS habilitado para este endpoint
+
+  deleteOrder:
+    handler: delete_order.handler
     events:
       - http:
-          path: /tienda/{tenant_id}
+          path: /usuarios/delete
+          method: delete
+          cors: true  # CORS habilitado para este endpoint
+
+  fetchOrder:
+    handler: fetch_user.handler
+    events:
+      - http:
+          path: /usuarios/fetch
           method: get
-          cors: true  # Habilitado por cada evento
-          integration: lambda
+          cors: true  # CORS habilitado para este endpoint
 
 resources:
   Resources:
-    TiendaTable:  # Nombre del recurso de la tabla DynamoDB
+    PedidosTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:service}-${sls:stage}-tienda  # El nombre de la tabla se genera de manera similar
+        TableName: ${self:provider.environment.PEDIDOS_TABLE}
         AttributeDefinitions:
           - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: pedido_id
+            AttributeType: S
+          - AttributeName: estado
+            AttributeType: S
+          - AttributeName: tenant_id#usuario_id
             AttributeType: S
         KeySchema:
           - AttributeName: tenant_id
             KeyType: HASH
+          - AttributeName: pedido_id
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
+        LocalSecondaryIndexes:
+          - IndexName: EstadoIndex
+            KeySchema:
+              - AttributeName: tenant_id
+                KeyType: HASH
+              - AttributeName: estado
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: UsuarioEstadoIndex
+            KeySchema:
+              - AttributeName: tenant_id#usuario_id
+                KeyType: HASH
+              - AttributeName: estado
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
