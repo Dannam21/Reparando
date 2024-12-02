@@ -9,7 +9,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole
   environment:
-    TABLE_NAME: ${sls:stage}-t_resenias
+    TABLE_NAME: ${sls:stage}-proyecto_resenias
 
 functions:
   crear:
