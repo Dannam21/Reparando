@@ -3,8 +3,9 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
     // Extraer tenant_id de los parámetros de la ruta
-    const { tenant_id } = event.pathParameters || {};  // Asegúrate de que pathParameters esté definido
+    const tenant_id = event.pathParameters && event.pathParameters.tenant_id;  // Asegúrate de que pathParameters esté definido
 
+    // Validar que tenant_id esté presente
     if (!tenant_id) {
         return {
             statusCode: 400,
