@@ -28,86 +28,42 @@ provider:
         - DELETE
 
 functions:
-  createCategoria:
-    handler: create_categoria.lambda_handler
+  crear:
+    handler: resenia.crearResenia
     events:
       - http:
-          path: categoria/create
+          path: /resenia/crear
           method: post
-          cors: true  # Habilitar CORS para este endpoint
-
-  getCategoria:
-    handler: get_categoria.lambda_handler
-    events:
-      - http:
-          path: categoria/get
-          method: get
-          cors: true  # Habilitar CORS para este endpoint
-
-  deleteCategoria:
-    handler: delete_categoria.lambda_handler
-    events:
-      - http:
-          path: categoria/delete
-          method: delete
-          cors: true  # Habilitar CORS para este endpoint
-
-  listCategorias:
-    handler: list_categorias.lambda_handler
-    events:
-      - http:
-          path: categoria/list
-          method: get
-          cors: true  # Habilitar CORS para este endpoint
-
-  updateCategoria:
-    handler: update_categoria.lambda_handler
-    events:
-      - http:
-          path: categoria/update
-          method: put
-          cors: true  # Habilitar CORS para este endpoint
+          cors: true  # Habilitado por cada evento
+          integration: lambda
 
 resources:
   Resources:
-    CategoriasDynamoDbTable:
+    TablaResenias:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.CATEGORIA_TABLE}
+        TableName: ${self:provider.environment.TABLE_NAME}
         AttributeDefinitions:
-          - AttributeName: categoria_id
+          - AttributeName: tenant_id#producto_id
             AttributeType: S
-          - AttributeName: tenant_id
+          - AttributeName: resenia_id
             AttributeType: S
-          - AttributeName: nombre
+          - AttributeName: fecha
             AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id
-            KeyType: HASH   # Clave de partición
-          - AttributeName: categoria_id
-            KeyType: RANGE  # Clave de ordenación
+          - AttributeName: tenant_id#producto_id
+            KeyType: HASH
+          - AttributeName: resenia_id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
-          - IndexName: LSI_Nombre
+          - IndexName: FechaIndex
             KeySchema:
-              - AttributeName: tenant_id  # Usamos 'tenant_id' como clave de partición para el LSI
+              - AttributeName: tenant_id#producto_id
                 KeyType: HASH
-              - AttributeName: nombre
+              - AttributeName: fecha
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-        GlobalSecondaryIndexes:
-          - IndexName: GSI_TenantID
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH  # Se usa 'tenant_id' para las consultas por inquilino
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
-
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
