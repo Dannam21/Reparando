@@ -10,6 +10,23 @@ provider:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
     PEDIDOS_TABLE: ${sls:stage}-pedidos
+  apiGateway:
+    cors:  # Configuración global de CORS
+      origins:
+        - '*'  # Permite solicitudes desde cualquier origen
+      allowCredentials: false  # Cambiar a true si deseas habilitar autenticación con cookies
+      allowHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowMethods:
+        - GET
+        - POST
+        - PATCH
+        - DELETE
+        - OPTIONS
 
 functions:
   createOrder:
@@ -18,7 +35,7 @@ functions:
       - http:
           path: /pedidos/create
           method: post
-          cors: true
+          cors: true  # CORS habilitado para este endpoint
           integration: lambda
 
   getOrder:
@@ -27,7 +44,7 @@ functions:
       - http:
           path: /pedidos/get
           method: get
-          cors: true
+          cors: true  # CORS habilitado para este endpoint
           integration: lambda
 
   deleteOrder:
@@ -36,7 +53,7 @@ functions:
       - http:
           path: /usuarios/delete
           method: delete
-          cors: true
+          cors: true  # CORS habilitado para este endpoint
           integration: lambda
 
   fetchOrder:
@@ -45,7 +62,7 @@ functions:
       - http:
           path: /usuarios/fetch
           method: get
-          cors: true
+          cors: true  # CORS habilitado para este endpoint
           integration: lambda
 
 resources:

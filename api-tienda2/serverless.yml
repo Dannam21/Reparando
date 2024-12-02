@@ -10,33 +10,49 @@ provider:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
     TIENDA_TABLE: ${self:service}-${sls:stage}-tienda  # Usamos la variable `${self:service}` para obtener el nombre del servicio y `${sls:stage}` para el entorno
+  apiGateway:
+    cors: # Configuración global de CORS
+      origins:
+        - '*'  # Permite solicitudes de cualquier origen
+      allowCredentials: false  # Cambiar según lo necesario (true si deseas habilitar cookies o autenticación)
+      allowHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
 
 functions:
-  createProduct:
+  createTienda:
     handler: create_tienda.handler
     events:
       - http:
           path: /tienda/create
           method: post
-          cors: true
+          cors: true  # Habilitado por cada evento
           integration: lambda
 
-  fetchProduct:
+  fetchTienda:
     handler: fetch_tienda.handler
     events:
       - http:
           path: /tienda/fetch
           method: get
-          cors: true
+          cors: true  # Habilitado por cada evento
           integration: lambda
     
-  getProduct:
+  getTienda:
     handler: get_tienda.handler
     events:
       - http:
           path: /tienda/{tenant_id}
           method: get
-          cors: true
+          cors: true  # Habilitado por cada evento
           integration: lambda
 
 resources:

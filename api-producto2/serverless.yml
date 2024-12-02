@@ -10,6 +10,23 @@ provider:
     role: arn:aws:iam::385301667309:role/LabRole
   environment:
     PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
+  apiGateway:
+    cors:  # Configuración global de CORS
+      origins:
+        - '*'  # Permite solicitudes desde cualquier origen
+      allowCredentials: false  # Cambiar a true si deseas habilitar autenticación con cookies
+      allowHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowMethods:
+        - GET
+        - POST
+        - PATCH
+        - DELETE
+        - OPTIONS
 
 functions:
   createProducto:
@@ -18,6 +35,7 @@ functions:
       - http:
           path: producto/create
           method: post
+          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
@@ -27,9 +45,9 @@ functions:
       - http:
           path: producto/get/{tenant_id}/{producto_id}
           method: get
+          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
-
 
   deleteProducto:
     handler: delete_producto.lambda_handler
@@ -37,6 +55,7 @@ functions:
       - http:
           path: producto/delete
           method: delete
+          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
@@ -46,6 +65,7 @@ functions:
       - http:
           path: producto/list
           method: get
+          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
@@ -55,6 +75,7 @@ functions:
       - http:
           path: producto/update
           method: patch
+          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
