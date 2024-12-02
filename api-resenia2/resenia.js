@@ -7,7 +7,10 @@ const TABLE_NAME = process.env.TABLE_NAME;
 const crearResenia = async (event) => {
     try {
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-        const { tenant_id, producto_id, usuario_id, puntaje, comentario, token } = body;
+        const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
+
+        // Obtener el token de los encabezados (headers)
+        const token = event.headers.Authorization || event.headers.token; // Cambia "Authorization" o "token" dependiendo de tu configuración de headers
 
         // Validar que los datos necesarios estén presentes
         if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario || !token) {
