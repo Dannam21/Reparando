@@ -2,23 +2,22 @@ const AWS = require("aws-sdk");
 const uuid = require("uuid");
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.TABLE_NAME;
+
 const crearResenia = async (event) => {
     try {
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
 
-        const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
+        const { tenant_id, producto_id, usuario_id, puntaje, comentario, datos } = body;
 
-        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario) {
+        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario || !datos) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: "Datos incompletos" }),
+                body: JSON.stringify({ message: "Datos incompletos" })
             };
         }
 
         const resenia_id = uuid.v4();
-        const fecha = new Date().toISOString();
-        const datos = 1;
-
+        const fecha = new Date().toISOString(); // Fecha actual
         const resenia = {
             "tenant_id#producto_id": `${tenant_id}#${producto_id}`,
             resenia_id,
@@ -26,28 +25,31 @@ const crearResenia = async (event) => {
             usuario_id,
             detalle: {
                 puntaje,
-                comentario,
+                comentario
             },
-            datos,
+            datos
         };
 
         const params = {
             TableName: TABLE_NAME,
-            Item: resenia,
+            Item: resenia
         };
 
         await dynamodb.put(params).promise();
 
-        // Devuelve el objeto anidado dentro de "resenia"
+        // Devuelve únicamente la reseña como JSON
         return {
             statusCode: 200,
-            body: JSON.stringify({ resenia }),
+            body: resenia
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: "Error al crear la reseña", error: error.message }),
+            body: {
+                message: "Error al crear la reseña",
+                error: error.message
+            }
         };
     }
 };
