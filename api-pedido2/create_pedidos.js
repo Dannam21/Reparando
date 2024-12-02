@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const crypto = require("crypto"); // Asegúrate de importar crypto si no lo has hecho
+const crypto = require("crypto");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
@@ -30,8 +30,8 @@ exports.handler = async (event) => {
     const params = {
         TableName: process.env.PEDIDOS_TABLE,
         Item: {
-            tenantID: tenant_id,
-            usuarioID: usuario_id,
+            tenant_id, // Cambio realizado para que coincida con DynamoDB
+            usuario_id,
             pedidoID: crypto.randomUUID(),
             estado: "PENDIENTE",
             datos: {
