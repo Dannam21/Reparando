@@ -19,7 +19,7 @@ functions:
           path: /resenia/crear
           method: post
           cors: true
-          integration: lambda
+    name: ${self:service}-${opt:stage, 'dev'}-crear-proyecto
 
 resources:
   Resources:
