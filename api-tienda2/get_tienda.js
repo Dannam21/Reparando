@@ -3,7 +3,7 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
     // Extraer tenant_id desde path
-    const tenant_id = event.path && event.path.tenant_id;  // Acceder directamente desde 'path'
+    const tenant_id = event.pathParameters ? event.pathParameters.tenant_id : null;  // Acceder a tenant_id desde pathParameters
 
     if (!tenant_id) {
         return {
@@ -29,6 +29,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Aquí se crea la respuesta de manera legible
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -38,7 +39,7 @@ exports.handler = async (event) => {
                     name: result.Item.datos.name,
                     fechaCreacion: result.Item.fechaCreacion
                 }
-            }),
+            }, null, 2),  // null, 2 le da un formato más legible (con sangrías)
         };
     } catch (error) {
         return {
