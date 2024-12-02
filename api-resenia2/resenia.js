@@ -17,17 +17,17 @@ const crearResenia = async (event) => {
         }
 
         const resenia_id = uuid.v4();
-        const fecha = new Date().toISOString(); // Fecha actual en formato ISO
+        const fecha = new Date().toISOString(); // Añadimos la fecha
         const resenia = {
-            "tenant_id#producto_id": `${tenant_id}#${producto_id}`, // Clave de partición combinada
-            resenia_id, // Clave de ordenamiento principal
-            fecha, // Clave de ordenamiento secundaria
+            "tenant_id#producto_id": `${tenant_id}#${producto_id}`,
+            resenia_id,
+            fecha,
             usuario_id,
             detalle: {
                 puntaje,
                 comentario
             },
-            datos // Nuevo campo
+            datos
         };
 
         const params = {
@@ -37,15 +37,22 @@ const crearResenia = async (event) => {
 
         await dynamodb.put(params).promise();
 
+        // Aquí devolvemos el JSON directamente, no como string serializado
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Reseña creada exitosamente", resenia })
+            body: {
+                message: "Reseña creada exitosamente",
+                resenia
+            }
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: "Error al crear la reseña", error: error.message })
+            body: {
+                message: "Error al crear la reseña",
+                error: error.message
+            }
         };
     }
 };
