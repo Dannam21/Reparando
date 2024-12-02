@@ -18,6 +18,16 @@ functions:
       - http:
           path: usuarios/create
           method: post
+          cors:
+            origin: '*'  # Permite todos los orígenes
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
 
   deleteUsuario:
     handler: delete_usuarios.lambda_handler
@@ -25,7 +35,16 @@ functions:
       - http:
           path: usuarios/delete
           method: delete
-
+          cors:
+            origin: '*'  # Permite todos los orígenes
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
 
   getUsuario:
     handler: get_usuarios.lambda_handler
@@ -33,6 +52,16 @@ functions:
       - http:
           path: usuarios/get
           method: get
+          cors:
+            origin: '*'  # Permite todos los orígenes
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
 
   loginUsuario:
     handler: login_usuarios.lambda_handler
@@ -40,6 +69,16 @@ functions:
       - http:
           path: usuarios/login
           method: post
+          cors:
+            origin: '*'  # Permite todos los orígenes
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
 
   updateUsuario:
     handler: update_usuarios.lambda_handler
@@ -47,6 +86,16 @@ functions:
       - http:
           path: usuarios/update
           method: put
+          cors:
+            origin: '*'  # Permite todos los orígenes
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
 
   ValidarTokenAcceso:
     handler: ValidarTokenAcceso.lambda_handler
@@ -54,6 +103,16 @@ functions:
       - http:
           path: usuarios/validar-token
           method: get
+          cors:
+            origin: '*'  # Permite todos los orígenes
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
 
 resources:
   Resources:
