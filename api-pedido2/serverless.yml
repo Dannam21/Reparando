@@ -13,7 +13,7 @@ provider:
 
 functions:
   createOrder:
-    handler: create_order.handler
+    handler: create_pedidos.handler
     events:
       - http:
           path: /pedidos/create
@@ -21,17 +21,8 @@ functions:
           cors: true
           integration: lambda
 
-  getOrder:
-    handler: get_order.handler
-    events:
-      - http:
-          path: /pedidos/get
-          method: get
-          cors: true
-          integration: lambda
-
   deleteOrder:
-    handler: delete_order.handler
+    handler: delete_pedidos.handler
     events:
       - http:
           path: /usuarios/delete
@@ -40,7 +31,7 @@ functions:
           integration: lambda
 
   fetchOrder:
-    handler: fetch_user.handler
+    handler: fetch_pedidos.handler
     events:
       - http:
           path: /usuarios/fetch
