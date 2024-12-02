@@ -2,7 +2,6 @@ const AWS = require("aws-sdk");
 const uuid = require("uuid");
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.TABLE_NAME;
-
 const crearResenia = async (event) => {
     try {
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
@@ -39,10 +38,10 @@ const crearResenia = async (event) => {
 
         await dynamodb.put(params).promise();
 
-        // Devuelve solo el objeto de la reseña
+        // Devuelve el objeto anidado dentro de "resenia"
         return {
             statusCode: 200,
-            body: JSON.stringify(resenia), // Se devuelve el objeto directamente
+            body: JSON.stringify({ resenia }),
         };
     } catch (error) {
         console.error(error);
@@ -52,5 +51,6 @@ const crearResenia = async (event) => {
         };
     }
 };
+
 
 module.exports.crearResenia = crearResenia;
