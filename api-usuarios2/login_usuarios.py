@@ -30,12 +30,7 @@ def lambda_handler(event, context):
         if not tenant_id or not email or not password:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Missing tenant_id, email, or password'}),
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',  # Permitir solicitudes de cualquier origen
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',  # Métodos permitidos
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization'  # Encabezados permitidos
-                }
+                'body': json.dumps({'error': 'Missing tenant_id, email, or password'})
             }
 
         hashed_password = hash_password(password)
@@ -54,12 +49,7 @@ def lambda_handler(event, context):
         if not items:
             return {
                 'statusCode': 403,
-                'body': json.dumps({'error': 'Usuario no existe'}),
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-                }
+                'body': json.dumps({'error': 'Usuario no existe'})
             }
 
         item = items[0]
@@ -78,32 +68,17 @@ def lambda_handler(event, context):
         else:
             return {
                 'statusCode': 403,
-                'body': json.dumps({'error': 'Password incorrecto'}),
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-                }
+                'body': json.dumps({'error': 'Password incorrecto'})
             }
 
         # Output (json)
         return {
             'statusCode': 200,
-            'body': json.dumps({'token': token}),
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-            }
+            'body': json.dumps({'token': token})
         }
     except Exception as e:
         logger.error("Error during login: %s", str(e))
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': 'Internal server error'}),
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-            }
+            'body': json.dumps({'error': 'Internal server error'})
         }
