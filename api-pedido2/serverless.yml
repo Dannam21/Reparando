@@ -1,5 +1,5 @@
 org: dannamendez
-service: api-tienda
+service: api-pedidos
 
 provider:
   name: aws
