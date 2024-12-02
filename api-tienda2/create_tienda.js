@@ -23,8 +23,25 @@ exports.handler = async (event) => {
 
     try {
         await dynamoDB.put(params).promise();
-        return { statusCode: 201, body: JSON.stringify({ message: "Tienda creado" }) };
+
+        return {
+            statusCode: 201,
+            body: JSON.stringify({
+                message: "Tienda creada exitosamente",
+                tienda: {
+                    tenant_id,
+                    datos,
+                    fechaCreacion: params.Item.fechaCreacion,
+                },
+            }),
+        };
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ message: "Error al crear tienda", error }) };
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: "Error al crear tienda",
+                error: error.message,
+            }),
+        };
     }
 };

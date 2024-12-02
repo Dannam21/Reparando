@@ -2,12 +2,20 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    const { tenant_id } = event.pathParameters;  // Obtener el tenant_id de los parámetros de la ruta
+    // Extraer tenant_id de los parámetros de la ruta
+    const { tenant_id } = event.pathParameters || {};  // Asegúrate de que pathParameters esté definido
+
+    if (!tenant_id) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "tenant_id es requerido" }),
+        };
+    }
 
     const params = {
-        TableName: process.env.TIENDA_TABLE,  // Nombre de la tabla de DynamoDB
+        TableName: process.env.TIENDA_TABLE,
         Key: {
-            tenant_id,  // Clave primaria de la tabla
+            tenant_id, // Usamos tenant_id para buscar en la tabla
         },
     };
 
@@ -23,12 +31,18 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify(result.Item),
+            body: JSON.stringify({
+                message: "Tienda encontrada",
+                tienda: result.Item,
+            }),
         };
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: "Error al obtener la tienda", error }),
+            body: JSON.stringify({
+                message: "Error al obtener la tienda",
+                error: error.message,
+            }),
         };
     }
 };
