@@ -33,7 +33,11 @@ exports.handler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({
                 message: "Tienda encontrada",
-                tienda: result.Item,
+                tienda: {
+                    tenant_id: result.Item.tenant_id,
+                    name: result.Item.datos.name,
+                    fechaCreacion: result.Item.fechaCreacion
+                }
             }),
         };
     } catch (error) {
