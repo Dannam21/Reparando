@@ -2,8 +2,12 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
+    // Verificar el evento recibido
+    console.log("Evento recibido:", JSON.stringify(event));
+
     // Extraer tenant_id desde path
     const tenant_id = event.pathParameters && event.pathParameters.tenant_id; // Acceder correctamente a tenant_id
+    console.log("tenant_id extraído:", tenant_id); // Verificar que se extrae correctamente
 
     if (!tenant_id) {
         return {
