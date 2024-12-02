@@ -10,23 +10,6 @@ provider:
     role: arn:aws:iam::385301667309:role/LabRole
   environment:
     CATEGORIA_TABLE: ${sls:stage}-t_categorias
-  apiGateway:
-    cors:  # Configuración global de CORS
-      origins:
-        - '*'  # Permite solicitudes desde cualquier origen
-      allowCredentials: false  # Cambiar a true si deseas habilitar autenticación con cookies
-      allowHeaders:
-        - Content-Type
-        - Authorization
-        - X-Amz-Date
-        - X-Api-Key
-        - X-Amz-Security-Token
-      allowMethods:
-        - GET
-        - POST
-        - PUT
-        - DELETE
-        - OPTIONS
 
 functions:
   createCategoria:
@@ -35,7 +18,6 @@ functions:
       - http:
           path: categoria/create
           method: post
-          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
@@ -45,7 +27,6 @@ functions:
       - http:
           path: categoria/get
           method: get
-          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
@@ -55,7 +36,6 @@ functions:
       - http:
           path: categoria/delete
           method: delete
-          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
@@ -65,7 +45,6 @@ functions:
       - http:
           path: categoria/list
           method: get
-          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
@@ -75,7 +54,6 @@ functions:
       - http:
           path: categoria/update
           method: put
-          cors: true  # CORS habilitado para este endpoint
     environment:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 

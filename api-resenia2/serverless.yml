@@ -10,22 +10,6 @@ provider:
     role: arn:aws:iam::385301667309:role/LabRole
   environment:
     TABLE_NAME: ${sls:stage}-t_resenias
-  apiGateway:
-    cors: # Configuración global de CORS
-      origins:
-        - '*'  # Permite solicitudes de cualquier origen
-      allowCredentials: false  # Cambiar según lo necesario (true si deseas habilitar cookies o autenticación)
-      allowHeaders:
-        - Content-Type
-        - Authorization
-        - X-Amz-Date
-        - X-Api-Key
-        - X-Amz-Security-Token
-      allowMethods:
-        - GET
-        - POST
-        - PUT
-        - DELETE
 
 functions:
   crear:
@@ -34,7 +18,7 @@ functions:
       - http:
           path: /resenia/crear
           method: post
-          cors: true  # Habilitado por cada evento
+          cors: true
           integration: lambda
 
 resources:
