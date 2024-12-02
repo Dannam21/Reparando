@@ -2,8 +2,10 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
+    console.log("Event received:", JSON.stringify(event, null, 2));  // Para depuración
+
     // Extraer tenant_id de los parámetros de la ruta
-    const tenant_id = event.pathParameters && event.pathParameters.tenant_id;  // Asegúrate de que pathParameters esté definido
+    const tenant_id = event.pathParameters && event.pathParameters.tenant_id;
 
     // Validar que tenant_id esté presente
     if (!tenant_id) {
