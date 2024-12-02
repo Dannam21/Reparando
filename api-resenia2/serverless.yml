@@ -1,0 +1,65 @@
+org: dannamendez
+service: api-resenia
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::385301667309:role/LabRole
+  environment:
+    TABLE_NAME: ${sls:stage}-t_resenias
+
+functions:
+  crear:
+    handler: resenia.crearResenia
+    events:
+      - http:
+          path: /resenia/crear
+          method: post
+          cors: true
+          integration: lambda
+
+resources:
+  Resources:
+    TablaResenias:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: resenia_id
+            AttributeType: S
+          - AttributeName: producto_id
+            AttributeType: S
+          - AttributeName: usuario_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+          - AttributeName: resenia_id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        LocalSecondaryIndexes:
+          - IndexName: ProductoIndex
+            KeySchema:
+              - AttributeName: tenant_id
+                KeyType: HASH
+              - AttributeName: producto_id
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: UsuarioIndex
+            KeySchema:
+              - AttributeName: tenant_id
+                KeyType: HASH
+              - AttributeName: usuario_id
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+

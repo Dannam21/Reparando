@@ -1,0 +1,101 @@
+org: dannamendez
+service: api-usuarios
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::385301667309:role/LabRole
+  environment:
+    USERS_TABLE: ${sls:stage}-usuarios
+
+functions:
+  createUsuario:
+    handler: create_usuarios.lambda_handler
+    events:
+      - http:
+          path: usuarios/create
+          method: post
+
+  deleteUsuario:
+    handler: delete_usuarios.lambda_handler
+    events:
+      - http:
+          path: usuarios/delete
+          method: delete
+
+
+  getUsuario:
+    handler: get_usuarios.lambda_handler
+    events:
+      - http:
+          path: usuarios/get
+          method: get
+
+  loginUsuario:
+    handler: login_usuarios.lambda_handler
+    events:
+      - http:
+          path: usuarios/login
+          method: post
+
+  updateUsuario:
+    handler: update_usuarios.lambda_handler
+    events:
+      - http:
+          path: usuarios/update
+          method: put
+
+  ValidarTokenAcceso:
+    handler: ValidarTokenAcceso.lambda_handler
+    events:
+      - http:
+          path: usuarios/validar-token
+          method: get
+
+resources:
+  Resources:
+    UsuariosDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+          - AttributeName: user_id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        LocalSecondaryIndexes:
+          - IndexName: BusquedaPorEmail
+            KeySchema:
+              - AttributeName: tenant_id
+                KeyType: HASH
+              - AttributeName: email
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    TokensAccesoDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: t_tokens_acceso
+        AttributeDefinitions:
+          - AttributeName: token
+            AttributeType: S
+        KeySchema:
+          - AttributeName: token
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

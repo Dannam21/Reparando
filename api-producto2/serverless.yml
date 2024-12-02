@@ -1,0 +1,108 @@
+org: dannamendez
+service: api-producto
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::385301667309:role/LabRole
+  environment:
+    PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
+
+functions:
+  createProducto:
+    handler: create_producto.lambda_handler
+    events:
+      - http:
+          path: producto/create
+          method: post
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  getProductoById:
+    handler: get_producto.lambda_handler
+    events:
+      - http:
+          path: producto/get/{tenant_id}/{producto_id}
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+
+  deleteProducto:
+    handler: delete_producto.lambda_handler
+    events:
+      - http:
+          path: producto/delete
+          method: delete
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  listProductos:
+    handler: list_productos.lambda_handler
+    events:
+      - http:
+          path: producto/list
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  updateProducto:
+    handler: update_producto.lambda_handler
+    events:
+      - http:
+          path: producto/update
+          method: patch
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+resources:
+  Resources:
+    ProductosDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTO_TABLE}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: producto_id
+            AttributeType: S
+          - AttributeName: stock
+            AttributeType: N
+          - AttributeName: tenant_id#categoria_nombre
+            AttributeType: S
+          - AttributeName: precio
+            AttributeType: N
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+          - AttributeName: producto_id
+            KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: LSI_Stock
+            KeySchema:
+              - AttributeName: tenant_id
+                KeyType: HASH
+              - AttributeName: stock
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: GSI_TenantID_CategoriaNombre
+            KeySchema:
+              - AttributeName: tenant_id#categoria_nombre
+                KeyType: HASH
+              - AttributeName: precio
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true

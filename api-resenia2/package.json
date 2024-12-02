@@ -1,0 +1,19 @@
+{
+    "name": "api-resenia",
+    "version": "1.0.0",
+    "description": "Microservicio para gestionar reseñas en una aplicación Multi-tenant",
+    "main": "resenia.js",
+    "scripts": {
+      "deploy": "serverless deploy",
+      "remove": "serverless remove",
+      "test": "serverless invoke local -f crear --path tests/create.json"
+    },
+    "dependencies": {
+      "aws-sdk": "^2.1372.0",
+      "uuid": "^9.0.0"
+    },
+    "devDependencies": {
+      "serverless": "^3.32.1"
+    }
+  }
+  
