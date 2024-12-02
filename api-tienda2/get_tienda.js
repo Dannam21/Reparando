@@ -3,12 +3,12 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
     // Extraer tenant_id desde path
-    const tenant_id = event.pathParameters ? event.pathParameters.tenant_id : null;  // Acceder a tenant_id desde pathParameters
+    const tenant_id = event.pathParameters && event.pathParameters.tenant_id; // Acceder correctamente a tenant_id
 
     if (!tenant_id) {
         return {
             statusCode: 400,
-            body: JSON.stringify({ message: "tenant_id es requerido" }),
+            body: JSON.stringify({ message: "tenant_id es requerido" }), // Retornar mensaje de error si no hay tenant_id
         };
     }
 
@@ -25,28 +25,27 @@ exports.handler = async (event) => {
         if (!result.Item) {
             return {
                 statusCode: 404,
-                body: JSON.stringify({ message: "Tienda no encontrada" }),
+                body: JSON.stringify({ message: "Tienda no encontrada" }), // Retornar mensaje si no se encuentra la tienda
             };
         }
 
-        // Aquí se crea la respuesta de manera legible
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Tienda encontrada",
+                message: "Tienda encontrada", // Mensaje de éxito
                 tienda: {
                     tenant_id: result.Item.tenant_id,
                     name: result.Item.datos.name,
-                    fechaCreacion: result.Item.fechaCreacion
+                    fechaCreacion: result.Item.fechaCreacion,
                 }
-            }, null, 2),  // null, 2 le da un formato más legible (con sangrías)
+            }),
         };
     } catch (error) {
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: "Error al obtener la tienda",
-                error: error.message,
+                message: "Error al obtener la tienda", // Mensaje de error
+                error: error.message, // Detalles del error
             }),
         };
     }
