@@ -9,7 +9,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
-    PEDIDOS_TABLE: ${sls:stage}-pedidos
+    PEDIDOS_TABLE: ${sls:stage}-proyecto-pedidos
 
 functions:
   createOrder:
