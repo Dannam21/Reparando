@@ -7,17 +7,19 @@ const crearResenia = async (event) => {
     try {
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
 
-        const { tenant_id, producto_id, usuario_id, puntaje, comentario, datos } = body;
+        const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
 
-        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario || !datos) {
+        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: "Datos incompletos" })
+                body: JSON.stringify({ message: "Datos incompletos" }),
             };
         }
 
         const resenia_id = uuid.v4();
-        const fecha = new Date().toISOString(); // Fecha actual
+        const fecha = new Date().toISOString();
+        const datos = 1;
+
         const resenia = {
             "tenant_id#producto_id": `${tenant_id}#${producto_id}`,
             resenia_id,
@@ -25,34 +27,30 @@ const crearResenia = async (event) => {
             usuario_id,
             detalle: {
                 puntaje,
-                comentario
+                comentario,
             },
-            datos
+            datos,
         };
 
         const params = {
             TableName: TABLE_NAME,
-            Item: resenia
+            Item: resenia,
         };
 
         await dynamodb.put(params).promise();
 
-        // Devuelve únicamente la reseña como JSON
+        // Devuelve solo el objeto de la reseña
         return {
             statusCode: 200,
-            body: resenia
+            body: JSON.stringify(resenia), // Se devuelve el objeto directamente
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
-            body: {
-                message: "Error al crear la reseña",
-                error: error.message
-            }
+            body: JSON.stringify({ message: "Error al crear la reseña", error: error.message }),
         };
     }
 };
-
 
 module.exports.crearResenia = crearResenia;
