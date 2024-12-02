@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     console.log("Evento recibido:", JSON.stringify(event));
 
     // Extraer tenant_id desde path
-    const tenant_id = event.pathParameters && event.pathParameters.tenant_id; // Acceder correctamente a tenant_id
+    const tenant_id = event.path && event.path.tenant_id; // Cambiar aquí para acceder correctamente a tenant_id
     console.log("tenant_id extraído:", tenant_id); // Verificar que se extrae correctamente
 
     if (!tenant_id) {
