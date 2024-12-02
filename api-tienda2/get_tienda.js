@@ -7,6 +7,7 @@ exports.handler = async (event) => {
     // Extraer tenant_id de los parámetros de la ruta
     const tenant_id = event.pathParameters && event.pathParameters.tenant_id;
 
+    print(tenant_id)
     // Validar que tenant_id esté presente
     if (!tenant_id) {
         return {
@@ -15,6 +16,7 @@ exports.handler = async (event) => {
         };
     }
 
+    print(tenant_id)
     const params = {
         TableName: process.env.TIENDA_TABLE,
         Key: {
@@ -27,25 +29,16 @@ exports.handler = async (event) => {
 
         if (!result.Item) {
             return {
-                statusCode: 404,
-                body: JSON.stringify({ message: "Tienda no encontrada" }),
+                statusCode: 404
             };
         }
 
         return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: "Tienda encontrada",
-                tienda: result.Item,
-            }),
+            statusCode: 200
         };
     } catch (error) {
         return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: "Error al obtener la tienda",
-                error: error.message,
-            }),
+            statusCode: 500
         };
     }
 };
