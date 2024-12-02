@@ -61,10 +61,18 @@ const crearResenia = async (event) => {
 
         await dynamodb.put(params).promise();
 
-        // Devuelve el objeto anidado dentro de "resenia"
+        // Devuelve el objeto dentro de "resenia" en el formato deseado
         return {
             statusCode: 200,
-            body: JSON.stringify({ resenia }),
+            body: JSON.stringify({
+                resenia: {
+                    "tenant_id#producto_id": resenia["tenant_id#producto_id"],
+                    resenia_id: resenia.resenia_id,
+                    fecha: resenia.fecha,
+                    usuario_id: resenia.usuario_id,
+                    detalle: resenia.detalle,
+                },
+            }),
         };
     } catch (error) {
         console.error(error);
