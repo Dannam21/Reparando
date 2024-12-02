@@ -30,9 +30,9 @@ exports.handler = async (event) => {
     const params = {
         TableName: process.env.PEDIDOS_TABLE,
         Item: {
-            tenant_id, // Cambio realizado para que coincida con DynamoDB
+            tenant_id, // Clave primaria esperada por DynamoDB
             usuario_id,
-            pedidoID: crypto.randomUUID(),
+            pedido_id: crypto.randomUUID(), // Generación automática del pedido_id
             estado: "PENDIENTE",
             datos: {
                 productos: datos.productos,
