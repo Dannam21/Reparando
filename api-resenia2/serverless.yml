@@ -28,38 +28,26 @@ resources:
       Properties:
         TableName: ${self:provider.environment.TABLE_NAME}
         AttributeDefinitions:
-          - AttributeName: tenant_id
+          - AttributeName: tenant_id#producto_id
             AttributeType: S
           - AttributeName: resenia_id
             AttributeType: S
-          - AttributeName: producto_id
-            AttributeType: S
-          - AttributeName: usuario_id
+          - AttributeName: fecha
             AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id
+          - AttributeName: tenant_id#producto_id
             KeyType: HASH
           - AttributeName: resenia_id
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
-          - IndexName: ProductoIndex
+          - IndexName: FechaIndex
             KeySchema:
-              - AttributeName: tenant_id
+              - AttributeName: tenant_id#producto_id
                 KeyType: HASH
-              - AttributeName: producto_id
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        GlobalSecondaryIndexes:
-          - IndexName: UsuarioIndex
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH
-              - AttributeName: usuario_id
+              - AttributeName: fecha
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
-

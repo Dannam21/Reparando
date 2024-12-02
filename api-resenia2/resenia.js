@@ -7,9 +7,9 @@ const crearResenia = async (event) => {
     try {
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
 
-        const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
+        const { tenant_id, producto_id, usuario_id, puntaje, comentario, datos } = body;
 
-        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario) {
+        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario || !datos) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: "Datos incompletos" })
@@ -17,15 +17,17 @@ const crearResenia = async (event) => {
         }
 
         const resenia_id = uuid.v4();
+        const fecha = new Date().toISOString(); // Fecha actual en formato ISO
         const resenia = {
-            tenant_id,
-            resenia_id,
-            producto_id,
+            "tenant_id#producto_id": `${tenant_id}#${producto_id}`, // Clave de partición combinada
+            resenia_id, // Clave de ordenamiento principal
+            fecha, // Clave de ordenamiento secundaria
             usuario_id,
             detalle: {
                 puntaje,
                 comentario
-            }
+            },
+            datos // Nuevo campo
         };
 
         const params = {
@@ -48,5 +50,4 @@ const crearResenia = async (event) => {
     }
 };
 
-// Exportar la función
 module.exports.crearResenia = crearResenia;
