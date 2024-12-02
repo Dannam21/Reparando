@@ -6,6 +6,7 @@ const TABLE_NAME = process.env.TABLE_NAME;
 
 const crearResenia = async (event) => {
     try {
+        // Parsear el cuerpo de la solicitud
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
         const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
 
@@ -45,8 +46,11 @@ const crearResenia = async (event) => {
         const fecha = new Date().toISOString();
         const datos = 1;
 
+        // Crear la reseña con la clave compuesta tenant_id#producto_id
         const resenia = {
-            "tenant_id#producto_id": `${tenant_id}#${producto_id}`,
+            "tenant_id#producto_id": `${tenant_id}#${producto_id}`, // clave compuesta
+            tenant_id, // clave de partición
+            producto_id, // clave de ordenación
             resenia_id,
             fecha,
             usuario_id,
@@ -62,9 +66,10 @@ const crearResenia = async (event) => {
             Item: resenia,
         };
 
+        // Guardar la reseña en DynamoDB
         await dynamodb.put(params).promise();
 
-        // Devuelve el objeto dentro de "resenia" en el formato deseado
+        // Devolver el objeto dentro de "resenia" en el formato deseado
         return {
             statusCode: 200,
             body: JSON.stringify({
