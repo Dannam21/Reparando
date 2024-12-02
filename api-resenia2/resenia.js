@@ -37,24 +37,22 @@ const crearResenia = async (event) => {
 
         await dynamodb.put(params).promise();
 
-        // Aquí devolvemos el JSON directamente, no como string serializado
+        // Devolvemos solo el objeto esperado
         return {
-            statusCode: 200,
-            body: {
-                message: "Reseña creada exitosamente",
-                resenia
-            }
+            message: "Reseña creada exitosamente",
+            resenia
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
-            body: {
+            body: JSON.stringify({
                 message: "Error al crear la reseña",
                 error: error.message
-            }
+            })
         };
     }
 };
+
 
 module.exports.crearResenia = crearResenia;
