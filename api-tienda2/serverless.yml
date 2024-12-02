@@ -29,6 +29,15 @@ functions:
           method: get
           cors: true
           integration: lambda
+    
+  getProduct:
+    handler: get_tienda.handler
+    events:
+      - http:
+          path: /tienda/{tenant_id}
+          method: get
+          cors: true
+          integration: lambda
 
 resources:
   Resources:
