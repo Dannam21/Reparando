@@ -11,18 +11,28 @@ exports.handler = async () => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify({
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: {
                 message: "Tiendas obtenidas exitosamente",
-                tiendas: result.Items,
-            }),
+                tiendas: result.Items.map((tienda) => ({
+                    tenant_id: tienda.tenant_id,
+                    nombre: tienda.datos.nombre,
+                    fechaCreacion: tienda.fechaCreacion,
+                })),
+            },
         };
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: {
                 message: "Error al obtener las tiendas",
                 error: error.message,
-            }),
+            },
         };
     }
 };
