@@ -1,39 +1,38 @@
 const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event) => {
+exports.handler = async () => {
     try {
         const params = {
             TableName: process.env.TIENDA_TABLE,
         };
 
-        // Obtener todas las tiendas
         const result = await dynamoDB.scan(params).promise();
-
-        // Formatear la respuesta con todos los campos
-        const tiendas = result.Items.map((item) => ({
-            tenant_id: item.tenant_id,
-            datos: item.datos || null, // Incluye datos si existen
-            fechaCreacion: item.fechaCreacion,
-        }));
 
         return {
             statusCode: 200,
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
+            body: {
                 message: "Tiendas obtenidas exitosamente",
-                tiendas,
-            }),
+                tiendas: result.Items.map((tienda) => ({
+                    tenant_id: tienda.tenant_id,
+                    datos: tienda.datos,
+                    fechaCreacion: tienda.fechaCreacion,
+                })),
+            },
         };
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({
-                message: "Error al obtener tiendas",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: {
+                message: "Error al obtener las tiendas",
                 error: error.message,
-            }),
+            },
         };
     }
 };
