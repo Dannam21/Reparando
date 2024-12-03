@@ -27,6 +27,19 @@ def lambda_handler(event, context):
         # Log the received event
         logger.info("Received event: %s", json.dumps(event))
 
+        # Handle preflight requests (CORS)
+        if event['httpMethod'] == 'OPTIONS':
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                    'Access-Control-Allow-Credentials': True
+                },
+                'body': json.dumps({'message': 'CORS preflight request handled'})
+            }
+
         # Parse the event body
         body = json.loads(event['body'])
         tenant_id = body.get('tenant_id')
@@ -38,9 +51,9 @@ def lambda_handler(event, context):
         if not tenant_id or not email or not data or not password:
             return {
                 'statusCode': 400,
-                'headers':{
+                'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
+                    'Access-Control-Allow-Credentials': True,
                 },
                 'body': json.dumps({'error': 'Missing tenantID, email, nombre, or password'})
             }
@@ -53,9 +66,9 @@ def lambda_handler(event, context):
         if response['Items']:
             return {
                 'statusCode': 400,
-                'headers':{
+                'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
+                    'Access-Control-Allow-Credentials': True,
                 },
                 'body': json.dumps({'error': 'Email already exists for this tenant'})
             }
@@ -91,17 +104,17 @@ def lambda_handler(event, context):
             'expires': fecha_hora_exp.strftime('%Y-%m-%d %H:%M:%S'),
             'user_id': user_id,
             'tenant_id': tenant_id,
-            'role':usuario["role"]
+            'role': usuario["role"]
         }
         tokens_table.put_item(Item=registro)
 
         # Return success response with token
         return {
             'statusCode': 201,
-            'headers':{
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
-                },
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+            },
             'body': json.dumps({
                 'message': 'Usuario creado',
                 'tenant_id': tenant_id,
@@ -114,9 +127,9 @@ def lambda_handler(event, context):
         logger.error("Error creating user: %s", str(e))
         return {
             'statusCode': 500,
-            'headers':{
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
-                },
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+            },
             'body': json.dumps({'error': str(e)})
         }
