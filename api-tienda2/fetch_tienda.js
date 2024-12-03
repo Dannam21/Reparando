@@ -14,14 +14,14 @@ exports.handler = async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: {
+            body: JSON.stringify({
                 message: "Tiendas obtenidas exitosamente",
                 tiendas: result.Items.map((tienda) => ({
                     tenant_id: tienda.tenant_id,
-                    nombre: tienda.datos.nombre,
+                    nombre: tienda.datos.nombre, // Extrae el campo nombre del objeto datos
                     fechaCreacion: tienda.fechaCreacion,
                 })),
-            },
+            }),
         };
     } catch (error) {
         return {
@@ -29,10 +29,10 @@ exports.handler = async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: {
+            body: JSON.stringify({
                 message: "Error al obtener las tiendas",
                 error: error.message,
-            },
+            }),
         };
     }
 };
