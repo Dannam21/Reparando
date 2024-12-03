@@ -1,6 +1,5 @@
 org: ${env:ORG}
 service: api-usuarios
-
 provider:
   name: aws
   runtime: python3.12
@@ -10,6 +9,8 @@ provider:
     role: ${env:IAM_ROLE_ARN}
   environment:
     USERS_TABLE: ${sls:stage}-usuarios
+    TOKENS_TABLE: ${sls:stage}-t_tokens_acceso
+    VALIDAR_TOKEN_LAMBDA_NAME: ${self:service}-${sls:stage}-ValidarTokenAcceso
 
 functions:
   createUsuario:
@@ -19,7 +20,7 @@ functions:
           path: usuarios/create
           method: post
           cors:
-            origin: '*' 
+            origin: '*'  # Permitir cualquier origen
             headers:
               - Content-Type
               - Authorization
@@ -34,7 +35,7 @@ functions:
           path: usuarios/delete
           method: delete
           cors:
-            origin: '*' 
+            origin: '*'  # Permitir cualquier origen
             headers:
               - Content-Type
               - Authorization
@@ -49,7 +50,7 @@ functions:
           path: usuarios/get
           method: get
           cors:
-            origin: '*' 
+            origin: '*'  # Permitir cualquier origen
             headers:
               - Content-Type
               - Authorization
@@ -64,7 +65,7 @@ functions:
           path: usuarios/login
           method: post
           cors:
-            origin: '*' 
+            origin: '*'  # Permitir cualquier origen
             headers:
               - Content-Type
               - Authorization
@@ -79,7 +80,7 @@ functions:
           path: usuarios/update
           method: put
           cors:
-            origin: '*' 
+            origin: '*'  # Permitir cualquier origen
             headers:
               - Content-Type
               - Authorization
@@ -94,7 +95,7 @@ functions:
           path: usuarios/validar-token
           method: get
           cors:
-            origin: '*' 
+            origin: '*'  # Permitir cualquier origen
             headers:
               - Content-Type
               - Authorization
