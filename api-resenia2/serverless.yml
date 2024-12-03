@@ -1,4 +1,4 @@
-org: dannamendez
+org: ${env:ORG}
 service: api-resenia
 
 provider:
@@ -7,18 +7,36 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+    role: ${env:IAM_ROLE_ARN}
   environment:
-    TABLE_NAME: ${sls:stage}-proyecto_resenias
+    TIENDA_TABLE: ${self:service}-${sls:stage}-tienda  # Usamos la variable `${self:service}` para obtener el nombre del servicio y `${sls:stage}` para el entorno
+    RESENA_TABLE: ${self:service}-${sls:stage}-resena  # Tabla para las reseñas
+
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'  # Permite cualquier origen
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+      allowCredentials: false
 
 functions:
-  crear:
+  CrearResenia:
     handler: resenia.crearResenia
     events:
       - http:
           path: /resenia/crear
           method: post
           cors: true
+          integration: lambda
     name: ${self:service}-${opt:stage, 'dev'}-crear-proyecto
 
 resources:

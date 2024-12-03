@@ -1,4 +1,4 @@
-org: dannamendez
+org: ${env:ORG}
 service: api-producto
 
 provider:
@@ -7,9 +7,27 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+    role: ${env:IAM_ROLE_ARN}
   environment:
     PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
+    VALIDAR_TOKEN_LAMBDA_NAME: api-usuarios-${self:provider.stage}-ValidarTokenAcceso
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'  # Permite cualquier origen
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+        - PATCH
+        - DELETE
+      allowCredentials: false
 
 functions:
   createProducto:

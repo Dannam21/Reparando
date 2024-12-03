@@ -12,6 +12,7 @@ logger.setLevel(logging.INFO)
 # Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
+VALIDAR_TOKEN_LAMBDA_NAME = os.environ['VALIDAR_TOKEN_LAMBDA_NAME']
 table = dynamodb.Table(table_name)
 
 # Función para convertir Decimal a float
@@ -46,7 +47,7 @@ def lambda_handler(event, context):
         }
 
         invoke_response = lambda_client.invoke(
-            FunctionName="api-usuarios-dev-ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
+            FunctionName=VALIDAR_TOKEN_LAMBDA_NAME,  # Asegúrate de que el nombre de la función sea correcto
             InvocationType='RequestResponse',
             Payload=json.dumps(payload)
         )

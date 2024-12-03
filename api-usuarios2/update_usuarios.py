@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Key
 # Configuración de DynamoDB
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ['USERS_TABLE']
+VALIDAR_TOKEN_LAMBDA_NAME =  os.environ['VALIDAR_TOKEN_LAMBDA_NAME']
 table = dynamodb.Table(USERS_TABLE)
 
 def lambda_handler(event, context):
@@ -25,6 +26,10 @@ def lambda_handler(event, context):
         if not tenant_id or not user_id:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'tenant_id and user_id are required'})
             }
 
@@ -37,6 +42,10 @@ def lambda_handler(event, context):
         if not token:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Authorization token is missing'})
             }
 
@@ -52,7 +61,7 @@ def lambda_handler(event, context):
 
         # Invocar la función de validación del token
         invoke_response = lambda_client.invoke(
-            FunctionName="ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
+            FunctionName=VALIDAR_TOKEN_LAMBDA_NAME,  # Asegúrate de que el nombre de la función sea correcto
             InvocationType='RequestResponse',
             Payload=payload_string
         )
@@ -62,6 +71,10 @@ def lambda_handler(event, context):
         if response1['statusCode'] == 403:
             return {
                 'statusCode': 403,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
             }
 
@@ -86,6 +99,10 @@ def lambda_handler(event, context):
             if response['Items']:
                 return {
                     'statusCode': 400,
+                    'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                     'body': json.dumps({'error': 'Email already exists for this tenant'})
                 }
 
@@ -108,6 +125,10 @@ def lambda_handler(event, context):
         # Retornar la respuesta con los atributos actualizados
         return {
             'statusCode': 200,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps(response['Attributes'])
         }
     
@@ -115,5 +136,9 @@ def lambda_handler(event, context):
         # Manejo de errores
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': str(e)})
         }

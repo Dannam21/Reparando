@@ -14,7 +14,8 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ['USERS_TABLE']
 table = dynamodb.Table(USERS_TABLE)
-TOKENS_TABLE = 't_tokens_acceso'
+
+TOKENS_TABLE = os.environ['TOKENS_TABLE']
 tokens_table = dynamodb.Table(TOKENS_TABLE)
 
 # Hash password function
@@ -37,6 +38,10 @@ def lambda_handler(event, context):
         if not tenant_id or not email or not data or not password:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Missing tenantID, email, nombre, or password'})
             }
 
@@ -48,6 +53,10 @@ def lambda_handler(event, context):
         if response['Items']:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Email already exists for this tenant'})
             }
 
@@ -89,6 +98,10 @@ def lambda_handler(event, context):
         # Return success response with token
         return {
             'statusCode': 201,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({
                 'message': 'Usuario creado',
                 'tenant_id': tenant_id,
@@ -101,5 +114,9 @@ def lambda_handler(event, context):
         logger.error("Error creating user: %s", str(e))
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': str(e)})
         }

@@ -1,10 +1,11 @@
 import boto3
 import json
 from datetime import datetime
+import os
 
 # Inicializar el cliente de DynamoDB
 dynamodb = boto3.resource('dynamodb')
-TOKENS_TABLE = 't_tokens_acceso'
+TOKENS_TABLE = os.environ['TOKENS_TABLE']
 tokens_table = dynamodb.Table(TOKENS_TABLE)
 
 def lambda_handler(event, context):

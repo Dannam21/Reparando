@@ -1,4 +1,4 @@
-org: dannamendez
+org: ${env:ORG}
 service: api-tienda-proyecto
 
 provider:
@@ -7,7 +7,7 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
+    role: ${env:IAM_ROLE_ARN}  # ARN del rol LabRole
   environment:
     TIENDA_TABLE: ${self:service}-${sls:stage}-tienda  # Usamos la variable `${self:service}` para obtener el nombre del servicio y `${sls:stage}` para el entorno
 
@@ -18,7 +18,14 @@ functions:
       - http:
           path: /tienda/create
           method: post
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
           integration: lambda
 
   fetchTienda:
@@ -27,8 +34,16 @@ functions:
       - http:
           path: /tienda/fetch
           method: get
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
           integration: lambda
+          
     
   getTienda:
     handler: get_tienda.handler

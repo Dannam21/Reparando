@@ -1,4 +1,4 @@
-org: dannamendez
+org: ${env:ORG}
 service: api-usuarios
 
 provider:
@@ -7,7 +7,7 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+    role: ${env:IAM_ROLE_ARN}
   environment:
     USERS_TABLE: ${sls:stage}-usuarios
 
@@ -19,15 +19,13 @@ functions:
           path: usuarios/create
           method: post
           cors:
-            origin: '*'  # Permite todos los orígenes
-            methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+            origin: '*' 
             headers:
               - Content-Type
               - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   deleteUsuario:
     handler: delete_usuarios.lambda_handler
@@ -36,15 +34,13 @@ functions:
           path: usuarios/delete
           method: delete
           cors:
-            origin: '*'  # Permite todos los orígenes
-            methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+            origin: '*' 
             headers:
               - Content-Type
               - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   getUsuario:
     handler: get_usuarios.lambda_handler
@@ -53,15 +49,13 @@ functions:
           path: usuarios/get
           method: get
           cors:
-            origin: '*'  # Permite todos los orígenes
-            methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+            origin: '*' 
             headers:
               - Content-Type
               - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   loginUsuario:
     handler: login_usuarios.lambda_handler
@@ -69,16 +63,14 @@ functions:
       - http:
           path: usuarios/login
           method: post
-          cors:
-            origin: '*'  # Permite todos los orígenes
-            methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+           cors:
+            origin: '*' 
             headers:
               - Content-Type
               - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   updateUsuario:
     handler: update_usuarios.lambda_handler
@@ -87,15 +79,13 @@ functions:
           path: usuarios/update
           method: put
           cors:
-            origin: '*'  # Permite todos los orígenes
-            methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+            origin: '*' 
             headers:
               - Content-Type
               - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   ValidarTokenAcceso:
     handler: ValidarTokenAcceso.lambda_handler
@@ -104,15 +94,13 @@ functions:
           path: usuarios/validar-token
           method: get
           cors:
-            origin: '*'  # Permite todos los orígenes
-            methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
+            origin: '*' 
             headers:
               - Content-Type
               - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
 resources:
   Resources:
@@ -148,7 +136,7 @@ resources:
     TokensAccesoDynamoDbTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: t_tokens_acceso
+        TableName:  ${self:provider.environment.TOKENS_TABLE}
         AttributeDefinitions:
           - AttributeName: token
             AttributeType: S

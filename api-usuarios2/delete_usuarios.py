@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Key
 # Configuración de DynamoDB
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ['USERS_TABLE']
+VALIDAR_TOKEN_LAMBDA_NAME =  os.environ['VALIDAR_TOKEN_LAMBDA_NAME']
 table = dynamodb.Table(USERS_TABLE)
 
 def lambda_handler(event, context):
@@ -32,7 +33,7 @@ def lambda_handler(event, context):
 
             # Invocar la función de validación del token
             invoke_response = lambda_client.invoke(
-                FunctionName="ValidarTokenAcceso",  # Asegúrate de que este sea el nombre correcto
+                FunctionName=VALIDAR_TOKEN_LAMBDA_NAME,  # Asegúrate de que este sea el nombre correcto
                 InvocationType='RequestResponse',
                 Payload=json.dumps(payload)
             )
@@ -50,6 +51,10 @@ def lambda_handler(event, context):
             if response1['statusCode'] == 403:
                 return {
                     'statusCode': 403,
+                    'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                     'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
                 }
 
@@ -72,7 +77,7 @@ def lambda_handler(event, context):
 
                 # Invocar la función de validación del token
                 invoke_response = lambda_client.invoke(
-                    FunctionName="ValidarTokenAcceso",
+                    FunctionName=VALIDAR_TOKEN_LAMBDA_NAME,
                     InvocationType='RequestResponse',
                     Payload=json.dumps(payload)
                 )
@@ -87,17 +92,29 @@ def lambda_handler(event, context):
                 if response1['statusCode'] == 403:
                     return {
                         'statusCode': 403,
+                        'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                    },
                         'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
                     }
             else:
                 return {
                     'statusCode': 404,
+                    'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                    },
                     'body': json.dumps({'error': 'Usuario no encontrado'})
                 }
 
         else:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Debe proporcionar tenant_id y user_id o tenant_id y email'})
             }
 
@@ -109,6 +126,10 @@ def lambda_handler(event, context):
         # Verificar si la eliminación fue exitosa
         return {
             'statusCode': 204,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'message': 'Usuario eliminado exitosamente'})
         }
 
@@ -117,5 +138,9 @@ def lambda_handler(event, context):
         print(f"Error: {str(e)}")  # Agregar impresión para diagnóstico
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': str(e)})
         }

@@ -1,4 +1,4 @@
-org: dannamendez
+org: ${env:ORG}
 service: api-categoria
 
 provider:
@@ -7,9 +7,27 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+    role: ${env:IAM_ROLE_ARN}
   environment:
     CATEGORIA_TABLE: ${sls:stage}-t_categorias
+
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'  # Permite cualquier origen
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      allowCredentials: false
 
 functions:
   createCategoria:

@@ -1,5 +1,5 @@
-org: dannamendez
-service: api-pedidos
+org: ${env:ORG}
+service: api-tienda
 
 provider:
   name: aws
@@ -7,9 +7,26 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
+    role: ${env:IAM_ROLE_ARN}  # ARN del rol LabRole
   environment:
-    PEDIDOS_TABLE: ${sls:stage}-proyecto-pedidos
+    PEDIDOS_TABLE: ${sls:stage}-pedidos
+
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'  # Permite cualquier origen
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+        - DELETE
+      allowCredentials: false
 
 functions:
   createOrder:
@@ -18,6 +35,15 @@ functions:
       - http:
           path: /pedidos/create
           method: post
+          cors: true
+          integration: lambda
+
+  getOrder:
+    handler: get_pedidos.handler
+    events:
+      - http:
+          path: /pedidos/get
+          method: get
           cors: true
           integration: lambda
 
