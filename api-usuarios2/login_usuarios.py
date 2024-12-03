@@ -26,42 +26,42 @@ def lambda_handler(event, context):
         email = body.get('email')
         password = body.get('password')
 
+        print("pasos")
+
         # Validate required fields
         if not tenant_id or not email or not password:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Missing tenant_id, email, or password'}),
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',  # Permitir solicitudes de cualquier origen
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',  # Métodos permitidos
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization'  # Encabezados permitidos
-                }
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
+                'body': json.dumps({'error': 'Missing tenant_id, email, or password'})
             }
-
+        print("pasos1")
         hashed_password = hash_password(password)
 
         # Process
         dynamodb = boto3.resource('dynamodb')
         users_table = dynamodb.Table(os.environ['USERS_TABLE'])
-        tokens_table = dynamodb.Table('t_tokens_acceso')
+        tokens_table = dynamodb.Table(os.environ['TOKENS_TABLE'])
 
         response = users_table.query(
             IndexName='BusquedaPorEmail',  # El nombre del índice LSI
             KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
         items = response.get('Items', [])
-
+        print("pasos2")
         if not items:
             return {
                 'statusCode': 403,
-                'body': json.dumps({'error': 'Usuario no existe'}),
-                'headers': {
+                 'headers':{
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-                }
+                    'Access-Control-Allow-Credentials': True, 
+                },
+                'body': json.dumps({'error': 'Usuario no existe'})
             }
-
+        print("pasos3")
         item = items[0]
         if hashed_password == item['password']:
             # Generate token
@@ -78,32 +78,29 @@ def lambda_handler(event, context):
         else:
             return {
                 'statusCode': 403,
-                'body': json.dumps({'error': 'Password incorrecto'}),
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-                }
+                    'Access-Control-Allow-Credentials': True, 
+                },
+                'body': json.dumps({'error': 'Password incorrecto'})
             }
 
         # Output (json)
         return {
             'statusCode': 200,
-            'body': json.dumps({'token': token}),
             'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-            }
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
+            'body': json.dumps({'token': token})
         }
     except Exception as e:
         logger.error("Error during login: %s", str(e))
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': 'Internal server error'}),
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-                'Access-Control-Allow-Headers': 'Content-Type,Authorization'
-            }
+            'headers':  {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
+            'body': json.dumps({'error': 'Internal server error'})
         }
