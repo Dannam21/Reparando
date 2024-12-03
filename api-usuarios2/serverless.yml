@@ -63,7 +63,7 @@ functions:
       - http:
           path: usuarios/login
           method: post
-           cors:
+          cors:
             origin: '*' 
             headers:
               - Content-Type
