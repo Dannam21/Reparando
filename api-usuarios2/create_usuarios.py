@@ -32,7 +32,7 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 200,
                 'headers': {
-                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Origin': 'http://localhost:5173',
                     'Access-Control-Allow-Methods': 'POST, OPTIONS',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
                     'Access-Control-Allow-Credentials': True
@@ -52,7 +52,7 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 400,
                 'headers': {
-                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Origin': 'http://localhost:5173',
                     'Access-Control-Allow-Credentials': True,
                 },
                 'body': json.dumps({'error': 'Missing tenantID, email, nombre, or password'})
@@ -67,7 +67,7 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 400,
                 'headers': {
-                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Origin': 'http://localhost:5173',
                     'Access-Control-Allow-Credentials': True,
                 },
                 'body': json.dumps({'error': 'Email already exists for this tenant'})
@@ -112,7 +112,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 201,
             'headers': {
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Origin': 'http://localhost:5173',
                 'Access-Control-Allow-Credentials': True,
             },
             'body': json.dumps({
