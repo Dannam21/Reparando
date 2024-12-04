@@ -19,13 +19,20 @@ functions:
           path: /tienda/create
           method: post
           cors:
-            origin: '*'  # Permitir cualquier origen
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
             headers:
               - Content-Type
               - Authorization
               - X-Amz-Date
               - X-Api-Key
               - X-Amz-Security-Token
+              - X-Amz-User-Agent
           integration: lambda
 
   fetchTienda:
@@ -35,13 +42,20 @@ functions:
           path: /tienda/fetch
           method: get
           cors:
-            origin: '*'  # Permitir cualquier origen
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
             headers:
               - Content-Type
               - Authorization
               - X-Amz-Date
               - X-Api-Key
               - X-Amz-Security-Token
+              - X-Amz-User-Agent
           integration: lambda
           
     
@@ -51,7 +65,21 @@ functions:
       - http:
           path: /tienda/{tenant_id}
           method: get
-          cors: true
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
           integration: lambda
 
 resources:

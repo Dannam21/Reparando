@@ -13,26 +13,30 @@ exports.handler = async () => {
             statusCode: 200,
             headers: {
                 "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",  // Permitir cualquier origen
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Amz-Date, X-Api-Key, X-Amz-Security-Token",
             },
-            body: {
+            body: JSON.stringify({
                 message: "Tiendas obtenidas exitosamente",
                 tiendas: result.Items.map((tienda) => ({
                     tenant_id: tienda.tenant_id,
                     datos: tienda.datos,
                     fechaCreacion: tienda.fechaCreacion,
                 })),
-            },
+            }),
         };
     } catch (error) {
         return {
             statusCode: 500,
             headers: {
                 "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",  // Permitir cualquier origen
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Amz-Date, X-Api-Key, X-Amz-Security-Token",
             },
-            body: {
+            body: JSON.stringify({
                 message: "Error al obtener las tiendas",
                 error: error.message,
-            },
+            }),
         };
     }
 };
