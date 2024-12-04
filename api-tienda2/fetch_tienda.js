@@ -15,14 +15,18 @@ exports.handler = async () => {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': true,
             },
-            body: JSON.stringify({
-                message: "Tiendas obtenidas exitosamente",
-                tiendas: result.Items.map((tienda) => ({
-                    tenant_id: tienda.tenant_id,
-                    datos: tienda.datos,
-                    fechaCreacion: tienda.fechaCreacion,
-                })),
-            }),
+            body: JSON.stringify(
+                {
+                    message: "Tiendas obtenidas exitosamente",
+                    tiendas: result.Items.map((tienda) => ({
+                        tenant_id: tienda.tenant_id,
+                        datos: tienda.datos,
+                        fechaCreacion: tienda.fechaCreacion,
+                    })),
+                },
+                null, // No reemplazar valores
+                2 // Sangría de 2 espacios
+            ),
         };
     } catch (error) {
         return {
