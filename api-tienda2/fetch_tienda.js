@@ -12,9 +12,8 @@ exports.handler = async () => {
         return {
             statusCode: 200,
             headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",  // Permitir cualquier origen
-                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Amz-Date, X-Api-Key, X-Amz-Security-Token",
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': true,
             },
             body: JSON.stringify({
                 message: "Tiendas obtenidas exitosamente",
@@ -29,9 +28,8 @@ exports.handler = async () => {
         return {
             statusCode: 500,
             headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",  // Permitir cualquier origen
-                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Amz-Date, X-Api-Key, X-Amz-Security-Token",
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': true,
             },
             body: JSON.stringify({
                 message: "Error al obtener las tiendas",
