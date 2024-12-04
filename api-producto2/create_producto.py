@@ -66,11 +66,12 @@ def lambda_handler(event, context):
         tenant_id = body.get('tenant_id')
         categoria_nombre = body.get('categoria_nombre')
         nombre = body.get('nombre')
+        img = body.get('img')
         stock = body.get('stock')  # Se espera que 'stock' sea un número entero
         precio = body.get('precio')  # Se espera que 'precio' sea un número
 
         # Validación de parámetros obligatorios
-        if not tenant_id or not categoria_nombre or not nombre or stock is None or not precio:
+        if not tenant_id or not categoria_nombre or not nombre or not img or stock is None or not precio:
             return {
                 'statusCode': 400,
                 'body': json.dumps({
@@ -113,6 +114,7 @@ def lambda_handler(event, context):
             'tenant_id': tenant_id,
             'categoria_nombre': categoria_nombre,
             'nombre': nombre,
+            'img': img,
             'stock': stock,  # Guardar como int
             'precio': precio  # Guardar como Decimal
         }
