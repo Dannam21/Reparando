@@ -1,5 +1,5 @@
 org: ${env:ORG}
-service: api-resenia
+service: proyecto-api-resenia
 
 provider:
   name: aws

@@ -1,5 +1,5 @@
 org: ${env:ORG}
-service: api-usuarios
+service: proyecto-api-usuarios
 provider:
   name: aws
   runtime: python3.12
