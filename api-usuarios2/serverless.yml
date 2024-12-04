@@ -8,7 +8,7 @@ provider:
   iam:
     role: ${env:IAM_ROLE_ARN}
   environment:
-    USERS_TABLE: ${sls:stage}-usuarios
+    USERS_TABLE: ${sls:stage}-proyecto-usuarios
     TOKENS_TABLE: ${sls:stage}-t_tokens_acceso
     VALIDAR_TOKEN_LAMBDA_NAME: ${self:service}-${sls:stage}-ValidarTokenAcceso
 
