@@ -111,6 +111,31 @@ functions:
               - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+  
+
+  listProductosUrl:
+    handler: list_productos_url.lambda_handler
+    events:
+      - http:
+          path: producto/list/url
+          method: get
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
   updateProducto:
     handler: update_producto.lambda_handler

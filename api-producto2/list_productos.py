@@ -40,7 +40,7 @@ def lambda_handler(event, context):
                 return obj
 
         items = decimal_to_float(items)
-
+        
         return {
             'statusCode': 200,
             'headers': {
