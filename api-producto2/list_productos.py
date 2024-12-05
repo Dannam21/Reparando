@@ -9,7 +9,7 @@ table = dynamodb.Table(table_name)
 def lambda_handler(event, context):
     try:
         # Obtener tenant_id y limit de los parámetros de consulta
-        tenant_id = event['queryStringParameters'].get('tennat_id')
+        tenant_id = event['queryStringParameters'].get('tenant_id')
         limit = int(event['queryStringParameters'].get('limit', 10))  # Valor predeterminado de 10 si no se proporciona limit
 
         print("limit:",limit)
@@ -29,7 +29,7 @@ def lambda_handler(event, context):
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id),
             Limit=limit
         )
-        print(items)
+        print(response)
 
         # Obtener los productos
         items = response.get('Items', [])
