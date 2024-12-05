@@ -5,30 +5,16 @@ provider:
   name: aws
   runtime: python3.12
   memorySize: 1024
-  timeout: 30
+  timeout: 29  # Timeout de las funciones Lambda y API Gateway ajustado a 29 segundos
   iam:
     role: ${env:IAM_ROLE_ARN}
   environment:
     PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
-    VALIDAR_TOKEN_LAMBDA_NAME: api-usuarios-${self:provider.stage}-ValidarTokenAcceso
-  httpApi:
-    cors:
-      allowedOrigins:
-        - '*'  # Permite cualquier origen
-      allowedHeaders:
-        - Content-Type
-        - X-Amz-Date
-        - Authorization
-        - X-Api-Key
-        - X-Amz-Security-Token
-      allowedMethods:
-        - OPTIONS
-        - GET
-        - POST
-        - PATCH
-        - DELETE
-      allowCredentials: false
-
+    VALIDAR_TOKEN_LAMBDA_NAME: proyecto-api-usuarios-${sls:stage}-ValidarTokenAcceso
+    BUCKET_NAME: ${sls:stage}-tienda-grupo-nahia-y-compania
+    SUBIR_IMAGENES_LAMBDA_NAME: ${self:service}-${sls:stage}-subirImagen
+    OBTENER_URL_LAMBDA_NAME: ${self:service}-${sls:stage}-obtenerUrlImagen
+  
 functions:
   createProducto:
     handler: create_producto.lambda_handler
@@ -36,6 +22,21 @@ functions:
       - http:
           path: producto/create
           method: post
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
@@ -45,9 +46,23 @@ functions:
       - http:
           path: producto/get/{tenant_id}/{producto_id}
           method: get
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
-
 
   deleteProducto:
     handler: delete_producto.lambda_handler
@@ -55,6 +70,21 @@ functions:
       - http:
           path: producto/delete
           method: delete
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
@@ -64,6 +94,46 @@ functions:
       - http:
           path: producto/list
           method: get
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+  
+
+  listProductosUrl:
+    handler: list_productos_url.lambda_handler
+    events:
+      - http:
+          path: producto/list/url
+          method: get
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
@@ -73,11 +143,44 @@ functions:
       - http:
           path: producto/update
           method: patch
+          cors:
+            origin: '*' # Permitir cualquier origen
+            methods: # Permitir estos métodos HTTP
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
+  subirImagen:
+    handler: subir_imagen_a_s3.lambda_handler
+
+  obtenerUrlImagen:
+    handler: obtener_url_imagen.lambda_handler
+
 resources:
   Resources:
+    # Bucket S3
+    TiendaGrupoNahiaYCompaniaBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BUCKET_NAME}
+        AccessControl: Private # Acceso privado al bucket
+        VersioningConfiguration:
+          Status: Enabled  # Habilita el versionado de objetos en el bucket
+
+    # Eliminado el recurso BucketPublicAccessBlock porque no es necesario y está causando errores
+
     ProductosDynamoDbTable:
       Type: AWS::DynamoDB::Table
       Properties:

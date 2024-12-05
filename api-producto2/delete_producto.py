@@ -17,6 +17,10 @@ def lambda_handler(event, context):
         if not token:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Authorization token is missing'})
             }
 
@@ -39,6 +43,10 @@ def lambda_handler(event, context):
         if response1['statusCode'] != 200:
             return {
                 'statusCode': 403,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Forbidden - Solo los administradores pueden eliminar productos'})
             }
 
@@ -50,6 +58,10 @@ def lambda_handler(event, context):
         if not tenant_id or not producto_id:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
             }
 
@@ -66,16 +78,28 @@ def lambda_handler(event, context):
         if 'Attributes' not in response:
             return {
                 'statusCode': 404,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
         # Respuesta de éxito
         return {
-            'statusCode': 204
+            'statusCode': 204,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                }
         }
 
     except Exception as e:
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': f'Error eliminando el producto: {str(e)}'})
         }

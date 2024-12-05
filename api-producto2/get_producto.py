@@ -12,6 +12,7 @@ logger.setLevel(logging.INFO)
 # Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
+OBTENER_URL_LAMBDA_NAME = os.environ['OBTENER_URL_LAMBDA_NAME']
 table = dynamodb.Table(table_name)
 
 # Función para convertir Decimal a float
@@ -33,6 +34,10 @@ def lambda_handler(event, context):
         if not tenant_id or not producto_id:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
             }
 
@@ -49,12 +54,50 @@ def lambda_handler(event, context):
         if not item:
             return {
                 'statusCode': 404,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
         # Retornar el producto con conversión de Decimal a float
+
+        lambda_client = boto3.client('lambda')
+        
+        img_object = {
+            'object_name': item['img'],
+        }
+
+        invoke_obtener_url = lambda_client.invoke(
+            FunctionName=OBTENER_URL_LAMBDA_NAME,
+            InvocationType='RequestResponse',
+            Payload=json.dumps(img_object)
+        )
+
+        response_url = json.loads(invoke_obtener_url['Payload'].read().decode())
+        logger.info("Image upload response: %s", response_url)
+
+        if response_url['statusCode'] != 200:
+            return {
+                'statusCode': 500,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
+                'body': json.dumps({
+                    'error': f'Error al obtener imagen: {str(e)}'
+                })
+            }
+
+        item['url_img']=response_url['url']
+
         return {
             'statusCode': 200,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'producto': item}, default=decimal_default)  # Aquí se usa decimal_default
         }
 
@@ -62,5 +105,9 @@ def lambda_handler(event, context):
         logger.error("Error obteniendo el producto: %s", str(e))
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': f'Error obteniendo el producto: {str(e)}'})
         }
