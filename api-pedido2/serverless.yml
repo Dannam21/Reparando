@@ -9,7 +9,7 @@ provider:
   iam:
     role: ${env:IAM_ROLE_ARN}  # ARN del rol LabRole
   environment:
-    PEDIDOS_TABLE: ${sls:stage}-pedidos
+    PEDIDOS_TABLE: ${sls:stage}-proyecto-pedidos
 
   httpApi:
     cors:
