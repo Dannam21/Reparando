@@ -5,7 +5,7 @@ provider:
   name: aws
   runtime: python3.12
   memorySize: 1024
-  timeout: 30
+  timeout: 29  # Timeout de las funciones Lambda y API Gateway ajustado a 29 segundos
   iam:
     role: ${env:IAM_ROLE_ARN}
   environment:
@@ -31,6 +31,7 @@ provider:
         - PATCH
         - DELETE
       allowCredentials: false
+    timeout: 29  # Timeout del API Gateway también ajustado a 29 segundos
 
 functions:
   createProducto:
@@ -50,7 +51,6 @@ functions:
           method: get
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
-
 
   deleteProducto:
     handler: delete_producto.lambda_handler
@@ -84,7 +84,7 @@ functions:
 
   obtenerUrlImagen:
     handler: obtener_url_imagen.lambda_handler
-  
+
 resources:
   Resources:
     # Bucket S3
@@ -92,21 +92,11 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.BUCKET_NAME}
-        AccessControl: Private # Puedes cambiar el acceso aquí si lo necesitas
+        AccessControl: Private # Acceso privado al bucket
         VersioningConfiguration:
           Status: Enabled  # Habilita el versionado de objetos en el bucket
 
-    # Políticas de acceso público al bucket
-    BucketPublicAccessBlock:
-      Type: AWS::S3::BucketPublicAccessBlock
-      Properties:
-        Bucket: ${self:provider.environment.BUCKET_NAME}
-        PublicAccessBlockConfiguration:
-          BlockPublicAcls: false
-          IgnorePublicAcls: false
-          BlockPublicPolicy: false
-          RestrictPublicBuckets: false
-
+    # Eliminado el recurso BucketPublicAccessBlock porque no es necesario y está causando errores
 
     ProductosDynamoDbTable:
       Type: AWS::DynamoDB::Table
