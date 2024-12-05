@@ -171,7 +171,7 @@ functions:
 resources:
   Resources:
     # Bucket S3
-    TiendaGrupoNahiaYCompaniaBucket:
+    TiendaGrupoNahiaYCompaniaBucketProyecto:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.BUCKET_NAME}
