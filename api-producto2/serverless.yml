@@ -10,7 +10,7 @@ provider:
     role: ${env:IAM_ROLE_ARN}
   environment:
     PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
-    VALIDAR_TOKEN_LAMBDA_NAME: api-usuarios-${self:provider.stage}-ValidarTokenAcceso
+    VALIDAR_TOKEN_LAMBDA_NAME: api-usuarios-${self:stage}-ValidarTokenAcceso
     BUCKET_NAME: ${sls:stage}-tienda-grupo-nahia-y-compania
     SUBIR_IMAGENES_LAMBDA_NAME: ${self:service}-${sls:stage}-subirImagen
     OBTENER_URL_LAMBDA_NAME: ${self:service}-${sls:stage}-obtenerUrlImagen
