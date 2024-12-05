@@ -11,7 +11,7 @@ provider:
   environment:
     PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
     VALIDAR_TOKEN_LAMBDA_NAME: proyecto-api-usuarios-${sls:stage}-ValidarTokenAcceso
-    BUCKET_NAME: ${sls:stage}-tienda-grupo-nahia-y-compania
+    BUCKET_NAME: ${sls:stage}-tienda-grupo-nahia-y-compania-proyecto
     SUBIR_IMAGENES_LAMBDA_NAME: ${self:service}-${sls:stage}-subirImagen
     OBTENER_URL_LAMBDA_NAME: ${self:service}-${sls:stage}-obtenerUrlImagen
   
