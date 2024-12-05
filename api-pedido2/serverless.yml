@@ -1,5 +1,5 @@
 org: ${env:ORG}
-service: proyecto-api-tienda
+service: proyecto-api-pedidos
 
 provider:
   name: aws
