@@ -28,10 +28,12 @@ def lambda_handler(event, context):
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id),
             Limit=limit
         )
+        print(items)
 
         # Obtener los productos
         items = response.get('Items', [])
 
+        print(items)
         # Devolver la lista de productos
         return {
             'statusCode': 200,
