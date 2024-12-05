@@ -29,6 +29,10 @@ def lambda_handler(event, context):
         if not token:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Authorization token is missing'})
             }
 
@@ -51,6 +55,10 @@ def lambda_handler(event, context):
         if response1['statusCode'] != 200:
             return {
                 'statusCode': 403,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
             }
 
@@ -64,6 +72,10 @@ def lambda_handler(event, context):
         if not tenant_id or not categoria_nombre or not nombre or not img or stock is None or not precio:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({
                     'error': 'Missing required data (tenant_id, categoria_nombre, nombre, stock, precio)'
                 })
@@ -74,6 +86,10 @@ def lambda_handler(event, context):
         except ValueError:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({
                     'error': 'El stock debe ser un número entero válido'
                 })
@@ -84,6 +100,10 @@ def lambda_handler(event, context):
         except ValueError:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({
                     'error': 'El precio debe ser un número válido'
                 })
@@ -109,6 +129,10 @@ def lambda_handler(event, context):
         if response_img['statusCode'] != 200:
             return {
                 'statusCode': 500,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({
                     'error': f'Error al subir imagen: {str(e)}'
                 })
@@ -130,6 +154,10 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 201,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({
                 'message': 'Producto creado',
                 'producto': producto,
@@ -140,6 +168,10 @@ def lambda_handler(event, context):
         logger.error("Error creando el producto: %s", str(e))
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({
                 'error': f'Error creando el producto: {str(e)}'
             })

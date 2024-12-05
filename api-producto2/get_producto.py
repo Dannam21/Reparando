@@ -34,6 +34,10 @@ def lambda_handler(event, context):
         if not tenant_id or not producto_id:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
             }
 
@@ -50,6 +54,10 @@ def lambda_handler(event, context):
         if not item:
             return {
                 'statusCode': 404,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
@@ -73,6 +81,10 @@ def lambda_handler(event, context):
         if response_url['statusCode'] != 200:
             return {
                 'statusCode': 500,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({
                     'error': f'Error al obtener imagen: {str(e)}'
                 })
@@ -82,6 +94,10 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'producto': item}, default=decimal_default)  # Aquí se usa decimal_default
         }
 
@@ -89,5 +105,9 @@ def lambda_handler(event, context):
         logger.error("Error obteniendo el producto: %s", str(e))
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': f'Error obteniendo el producto: {str(e)}'})
         }

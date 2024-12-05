@@ -16,6 +16,10 @@ def lambda_handler(event, context):
         if not tenant_id:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'tenantID es requerido'})
             }
 
@@ -31,6 +35,10 @@ def lambda_handler(event, context):
         # Devolver la lista de productos
         return {
             'statusCode': 200,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({
                 'productos': items
             })
@@ -40,6 +48,10 @@ def lambda_handler(event, context):
         # Manejo de errores generales
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({
                 'error': f'Ocurrió un error al obtener los productos: {str(e)}'
             })

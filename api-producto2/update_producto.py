@@ -19,6 +19,10 @@ def lambda_handler(event, context):
         if not token:
             return {
                 'statusCode': 401,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'message': 'Token de autorización faltante'})
             }
 
@@ -40,6 +44,10 @@ def lambda_handler(event, context):
         if response.get('statusCode') != 200:
             return {
                 'statusCode': 403,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'message': 'Acceso denegado. Token no válido o rol no autorizado'})
             }
 
@@ -53,6 +61,10 @@ def lambda_handler(event, context):
         if not tenant_id or not producto_id or not updates:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'message': 'tenant_id, producto_id y updates son requeridos'})
             }
 
@@ -77,11 +89,19 @@ def lambda_handler(event, context):
 
         # Devolver la respuesta con los atributos actualizados
         return {
-            'statusCode': 200
+            'statusCode': 200,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                }
         }
 
     except Exception as e:
         # Manejo de errores
         return {
-            'statusCode': 500
+            'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                }
         }
