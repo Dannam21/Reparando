@@ -44,7 +44,7 @@ resources:
     TablaResenias:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.TABLE_NAME}
+        TableName: ${self:provider.environment.RESENA_TABLE}
         AttributeDefinitions:
           - AttributeName: tenant_id
             AttributeType: S
