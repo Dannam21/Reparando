@@ -12,6 +12,7 @@ def lambda_handler(event, context):
         tenant_id = event['queryStringParameters'].get('tennat_id')
         limit = int(event['queryStringParameters'].get('limit', 10))  # Valor predeterminado de 10 si no se proporciona limit
 
+        print("limit:",limit)
         # Validar que tenant_id esté presente
         if not tenant_id:
             return {
