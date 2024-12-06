@@ -90,25 +90,25 @@ functions:
 
 
   fetchProductosByTenantId:
-  handler: fetch_productos_by_tenant_id.lambda_handler
-  events:
-    - http:
-        path: producto/fetch
-        method: get
-        cors:
-          origin: '*'
-          methods:
-            - OPTIONS
-            - GET
-          headers:
-            - Content-Type
-            - Authorization
-            - X-Amz-Date
-            - X-Api-Key
-            - X-Amz-Security-Token
-            - X-Amz-User-Agent
-  environment:
-    TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+    handler: fetch_productos_by_tenant_id.lambda_handler
+    events:
+      - http:
+          path: producto/fetch
+          method: get
+          cors:
+            origin: '*'
+            methods:
+              - OPTIONS
+              - GET
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
 
   listProductos:
