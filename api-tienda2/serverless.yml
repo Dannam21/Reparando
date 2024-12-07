@@ -97,3 +97,13 @@ resources:
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
+
+plugins:
+  - serverless-plugin-optimize
+
+custom:
+  # Aquí puedes agregar más configuraciones personalizadas si las necesitas
+  package:
+    exclude:
+      - node_modules/aws-sdk/**  # Esto se usa si ya estás incluyendo aws-sdk en la capa de Lambda o no necesitas que se empaquete explícitamente
+
