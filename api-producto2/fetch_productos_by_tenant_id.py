@@ -5,13 +5,17 @@ import logging
 from boto3.dynamodb.conditions import Key
 from decimal import Decimal
 
+# Configuración de logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
+OBTENER_URL_LAMBDA_NAME = os.environ['OBTENER_URL_LAMBDA_NAME']
 table = dynamodb.Table(table_name)
 
+# Función para convertir Decimal a float
 def decimal_default(obj):
     if isinstance(obj, Decimal):
         return float(obj)
@@ -23,8 +27,8 @@ def lambda_handler(event, context):
         logger.info("Received event: %s", json.dumps(event))
 
         # Obtener los parámetros de la ruta
-        tenant_id = event['pathParameters'].get('tenant_id')
-        producto_id = event['pathParameters'].get('producto_id')
+        tenant_id = event['pathParameters']['tenant_id']
+        producto_id = event['pathParameters']['producto_id']
 
         # Validar parámetros
         if not tenant_id or not producto_id:
@@ -57,41 +61,33 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
-        # Verificar que el producto tenga una imagen asociada
-        img_name = item.get('img')
-        if not img_name:
-            return {
-                'statusCode': 404,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True,
-                },
-                'body': json.dumps({'error': 'Imagen no asociada al producto'})
-            }
-
-        # Invocar la Lambda para obtener la URL de la imagen
+        # Invocar otra Lambda para obtener la URL de la imagen
         lambda_client = boto3.client('lambda')
-        invoke_response = lambda_client.invoke(
+        img_object = {'object_name': item['img']}
+
+        invoke_obtener_url = lambda_client.invoke(
             FunctionName=OBTENER_URL_LAMBDA_NAME,
             InvocationType='RequestResponse',
-            Payload=json.dumps({'object_name': img_name})
+            Payload=json.dumps(img_object)
         )
 
-        response_payload = json.loads(invoke_response['Payload'].read().decode())
-        logger.info("Image URL response: %s", response_payload)
+        response_url = json.loads(invoke_obtener_url['Payload'].read().decode())
+        logger.info("Image upload response: %s", response_url)
 
-        if response_payload.get('statusCode') != 200:
+        if response_url['statusCode'] != 200:
             return {
                 'statusCode': 500,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': True,
                 },
-                'body': json.dumps({'error': 'Error al obtener la URL de la imagen'})
+                'body': json.dumps({
+                    'error': f'Error al obtener imagen: {response_url.get("error", "Error desconocido")}'
+                })
             }
 
         # Agregar la URL de la imagen al producto
-        item['url_img'] = response_payload['url']
+        item['url_img'] = response_url['url']
 
         # Retornar el producto con conversión de Decimal a float
         return {
