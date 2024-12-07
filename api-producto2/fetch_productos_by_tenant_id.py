@@ -88,17 +88,31 @@ def lambda_handler(event, context):
                 })
             }
 
-        # Agregar la URL de la imagen al item
-        item['url_img'] = response_url['url']
+        # La URL que queremos incluir debe ser la URL completa con el parámetro de firma
+        item['url_img'] = response_url['url']  # Suponiendo que esta URL contiene la firma de acceso
 
-        # Retornar el producto con formato requerido
+        # Formatear el objeto de respuesta según el formato exacto requerido
+        response_body = {
+            "producto": {
+                "img": item.get("img"),
+                "categoria_nombre": item.get("categoria_nombre"),
+                "nombre": item.get("nombre"),
+                "tenant_id": item.get("tenant_id"),
+                "stock": float(item.get("stock", 0)),
+                "producto_id": item.get("producto_id"),
+                "precio": float(item.get("precio", 0)),
+                "tenant_id#categoria_nombre": f"{item.get('tenant_id')}#{item.get('categoria_nombre')}",
+                "url_img": item.get("url_img")  # Aquí ya está la URL completa con firma
+            }
+        }
+
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True, 
             },
-            'body': json.dumps({'producto': item}, default=decimal_default)
+            'body': json.dumps(response_body, default=decimal_default)
         }
 
     except Exception as e:
