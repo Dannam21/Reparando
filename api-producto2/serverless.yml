@@ -89,28 +89,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
 
-  fetchProductosByTenantId:
-    handler: fetch_productos_by_tenant_id.lambda_handler
-    events:
-      - http:
-          path: producto/fetch
-          method: get
-          cors:
-            origin: '*'
-            methods:
-              - OPTIONS
-              - GET
-            headers:
-              - Content-Type
-              - Authorization
-              - X-Amz-Date
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-    environment:
-      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
-
-
+  
   listProductos:
     handler: list_productos.lambda_handler
     events:
@@ -184,6 +163,30 @@ functions:
               - X-Amz-User-Agent
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  
+  getProductosByTenant:
+    handler: get_productos_by_tenant.lambda_handler
+    events:
+      - http:
+          path: producto/list/tenant
+          method: get
+          cors:
+            origin: '*'
+            methods:
+              - OPTIONS
+              - GET
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+      OBTENER_URL_LAMBDA_NAME: ${self:provider.environment.OBTENER_URL_LAMBDA_NAME}
+
 
   subirImagen:
     handler: subir_imagen_a_s3.lambda_handler
