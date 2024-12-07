@@ -26,8 +26,9 @@ def lambda_handler(event, context):
         # Log event for debugging
         logger.info("Received event: %s", json.dumps(event))
 
-        # Obtener el tenant_id de la ruta
-        tenant_id = event['queryStringParameters'].get('tenant_id')
+        # Obtener el tenant_id de la ruta de la API
+        path_params = event.get('pathParameters', {})
+        tenant_id = path_params.get('tenant_id')
 
         # Validar tenant_id
         if not tenant_id:
