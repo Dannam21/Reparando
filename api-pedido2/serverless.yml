@@ -51,7 +51,7 @@ functions:
     handler: delete_pedidos.handler
     events:
       - http:
-          path: /usuarios/delete
+          path: /pedidos/delete
           method: delete
           cors: true
           integration: lambda
@@ -60,8 +60,17 @@ functions:
     handler: fetch_pedidos.handler
     events:
       - http:
-          path: /usuarios/fetch
+          path: /pedidos/fetch
           method: get
+          cors: true
+          integration: lambda
+
+  updateOrder:
+    handler: update_pedidos.handler
+    events:
+      - http:
+          path: /pedidos/update
+          method: patch
           cors: true
           integration: lambda
 
