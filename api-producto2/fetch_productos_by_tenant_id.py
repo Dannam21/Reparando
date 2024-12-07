@@ -42,6 +42,7 @@ def lambda_handler(event, context):
             }
 
         # Consultar el producto en DynamoDB
+        logger.info(f"Consultando DynamoDB para tenant_id={tenant_id} y producto_id={producto_id}")
         response = table.get_item(
             Key={
                 'tenant_id': tenant_id,
@@ -51,6 +52,8 @@ def lambda_handler(event, context):
 
         # Verificar si se encontró el producto
         item = response.get('Item')
+        logger.info(f"Producto encontrado en DynamoDB: {item}")
+
         if not item:
             return {
                 'statusCode': 404,
@@ -63,6 +66,8 @@ def lambda_handler(event, context):
 
         # Verificar si existe el campo 'img' en el producto
         img_object = item.get('img')
+        logger.info(f"Campo 'img' encontrado: {img_object}")
+
         if not img_object:
             return {
                 'statusCode': 404,
@@ -79,6 +84,7 @@ def lambda_handler(event, context):
             'object_name': img_object,
         }
 
+        logger.info(f"Invocando la Lambda para obtener la URL de la imagen: {img_object}")
         invoke_obtener_url = lambda_client.invoke(
             FunctionName=OBTENER_URL_LAMBDA_NAME,
             InvocationType='RequestResponse',
@@ -86,7 +92,7 @@ def lambda_handler(event, context):
         )
 
         response_url = json.loads(invoke_obtener_url['Payload'].read().decode())
-        logger.info("Image upload response: %s", response_url)
+        logger.info(f"Respuesta de la Lambda para la URL de la imagen: {response_url}")
 
         if response_url.get('statusCode') != 200:
             return {
@@ -102,6 +108,8 @@ def lambda_handler(event, context):
 
         # Asegurarse de que la URL esté presente en la respuesta de la Lambda
         url_img = response_url.get('url')
+        logger.info(f"URL de imagen obtenida: {url_img}")
+
         if not url_img:
             return {
                 'statusCode': 500,
