@@ -27,133 +27,79 @@ def lambda_handler(event, context):
         logger.info("Received event: %s", json.dumps(event))
 
         # Obtener los parámetros de la ruta
-        tenant_id = event['pathParameters']['tenant_id']
-        producto_id = event['pathParameters']['producto_id']
+        tenant_id = event['queryStringParameters'].get('tenant_id')
 
         # Validar parámetros
-        if not tenant_id or not producto_id:
+        if not tenant_id:
             return {
                 'statusCode': 400,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
+                    'Access-Control-Allow-Credentials': True,
                 },
-                'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
+                'body': json.dumps({'error': 'tenant_id es requerido'})
             }
 
-        # Consultar el producto en DynamoDB
-        logger.info(f"Consultando DynamoDB para tenant_id={tenant_id} y producto_id={producto_id}")
-        response = table.get_item(
-            Key={
-                'tenant_id': tenant_id,
-                'producto_id': producto_id
-            }
+        # Consultar los productos de DynamoDB para el tenant_id
+        response = table.query(
+            IndexName="GSI_TenantID_CategoriaNombre",  # Usamos el índice global por tenant_id
+            KeyConditionExpression=Key('tenant_id').eq(tenant_id),
         )
 
-        # Verificar si se encontró el producto
-        item = response.get('Item')
-        logger.info(f"Producto encontrado en DynamoDB: {item}")
+        productos = response.get('Items', [])
 
-        if not item:
+        if not productos:
             return {
                 'statusCode': 404,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
+                    'Access-Control-Allow-Credentials': True,
                 },
-                'body': json.dumps({'error': 'Producto no encontrado'})
+                'body': json.dumps({'error': 'No productos encontrados'})
             }
 
-        # Verificar si existe el campo 'img' en el producto
-        img_object = item.get('img')
-        logger.info(f"Campo 'img' encontrado: {img_object}")
-
-        if not img_object:
-            return {
-                'statusCode': 404,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
-                },
-                'body': json.dumps({'error': 'Imagen no encontrada para el producto'})
-            }
-
-        # Invocar la Lambda para obtener la URL de la imagen
+        # Obtener las URLs de las imágenes para cada producto
         lambda_client = boto3.client('lambda')
-        img_object = {
-            'object_name': img_object,
-        }
-
-        logger.info(f"Invocando la Lambda para obtener la URL de la imagen: {img_object}")
-        invoke_obtener_url = lambda_client.invoke(
-            FunctionName=OBTENER_URL_LAMBDA_NAME,
-            InvocationType='RequestResponse',
-            Payload=json.dumps(img_object)
-        )
-
-        response_url = json.loads(invoke_obtener_url['Payload'].read().decode())
-        logger.info(f"Respuesta de la Lambda para la URL de la imagen: {response_url}")
-
-        if response_url.get('statusCode') != 200:
-            return {
-                'statusCode': 500,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
-                },
-                'body': json.dumps({
-                    'error': 'Error al obtener imagen'
-                })
+        for producto in productos:
+            img_object = {
+                'file_base64': producto.get('img'),
+                'directory': tenant_id
             }
 
-        # Asegurarse de que la URL esté presente en la respuesta de la Lambda
-        url_img = response_url.get('url')
-        logger.info(f"URL de imagen obtenida: {url_img}")
+            invoke_response_subir_imagen = lambda_client.invoke(
+                FunctionName=OBTENER_URL_LAMBDA_NAME,
+                InvocationType='RequestResponse',
+                Payload=json.dumps(img_object)
+            )
 
-        if not url_img:
-            return {
-                'statusCode': 500,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True, 
-                },
-                'body': json.dumps({'error': 'URL de imagen no encontrada en la respuesta de la Lambda'})
-            }
+            response_img = json.loads(invoke_response_subir_imagen['Payload'].read().decode())
+            logger.info("Image URL response: %s", response_img)
 
-        # Agregar la URL de la imagen a la respuesta
-        item['url_img'] = url_img
-
-        # Formatear el objeto de respuesta según el formato exacto requerido
-        response_body = {
-            "producto": {
-                "img": item.get("img"),
-                "categoria_nombre": item.get("categoria_nombre"),
-                "nombre": item.get("nombre"),
-                "tenant_id": item.get("tenant_id"),
-                "stock": float(item.get("stock", 0)),
-                "producto_id": item.get("producto_id"),
-                "precio": float(item.get("precio", 0)),
-                "tenant_id#categoria_nombre": f"{item.get('tenant_id')}#{item.get('categoria_nombre')}",
-                "url_img": item.get("url_img")  # Aquí ya está la URL completa con firma
-            }
-        }
+            if response_img['statusCode'] == 200:
+                producto['url_img'] = response_img['body']
+            else:
+                producto['url_img'] = None
 
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True, 
+                'Access-Control-Allow-Credentials': True,
             },
-            'body': json.dumps(response_body, default=decimal_default)
+            'body': json.dumps({
+                'productos': productos
+            }, default=decimal_default)
         }
 
     except Exception as e:
-        logger.error("Error obteniendo el producto: %s", str(e))
+        logger.error("Error obteniendo los productos: %s", str(e))
         return {
             'statusCode': 500,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True, 
+                'Access-Control-Allow-Credentials': True,
             },
-            'body': json.dumps({'error': f'Error obteniendo el producto: {str(e)}'})
+            'body': json.dumps({
+                'error': f'Error obteniendo los productos: {str(e)}'
+            })
         }
