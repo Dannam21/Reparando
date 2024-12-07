@@ -26,10 +26,10 @@ def lambda_handler(event, context):
         # Log event for debugging
         logger.info("Received event: %s", json.dumps(event))
 
-        # Obtener los parámetros de la ruta
+        # Obtener el tenant_id de la ruta
         tenant_id = event['queryStringParameters'].get('tenant_id')
 
-        # Validar parámetros
+        # Validar tenant_id
         if not tenant_id:
             return {
                 'statusCode': 400,
@@ -40,29 +40,31 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'tenant_id es requerido'})
             }
 
-        # Consultar los productos de DynamoDB para el tenant_id
+        # Consultar los productos de DynamoDB por tenant_id
         response = table.query(
-            IndexName="GSI_TenantID_CategoriaNombre",  # Usamos el índice global por tenant_id
-            KeyConditionExpression=Key('tenant_id').eq(tenant_id),
+            KeyConditionExpression=Key('tenant_id').eq(tenant_id)
         )
 
-        productos = response.get('Items', [])
-
-        if not productos:
+        # Validar que haya productos
+        if 'Items' not in response or len(response['Items']) == 0:
             return {
                 'statusCode': 404,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': True,
                 },
-                'body': json.dumps({'error': 'No productos encontrados'})
+                'body': json.dumps({'error': 'No se encontraron productos para este tenant_id'})
             }
 
-        # Obtener las URLs de las imágenes para cada producto
+        # Procesar los productos y obtener la URL de la imagen
+        productos = response['Items']
         lambda_client = boto3.client('lambda')
+
+        productos_con_url = []
         for producto in productos:
+            # Obtener la URL de la imagen usando el Lambda
             img_object = {
-                'file_base64': producto.get('img'),
+                'file_base64': producto['img'],  # Asumiendo que 'img' contiene la base64 de la imagen
                 'directory': tenant_id
             }
 
@@ -75,10 +77,10 @@ def lambda_handler(event, context):
             response_img = json.loads(invoke_response_subir_imagen['Payload'].read().decode())
             logger.info("Image URL response: %s", response_img)
 
+            # Agregar la URL de la imagen al producto
             if response_img['statusCode'] == 200:
-                producto['url_img'] = response_img['body']
-            else:
-                producto['url_img'] = None
+                producto['url_img'] = response_img['body']  # Asumiendo que la URL está en 'body'
+                productos_con_url.append(producto)
 
         return {
             'statusCode': 200,
@@ -86,20 +88,16 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,
             },
-            'body': json.dumps({
-                'productos': productos
-            }, default=decimal_default)
+            'body': json.dumps({'productos': productos_con_url}, default=decimal_default)
         }
 
     except Exception as e:
-        logger.error("Error obteniendo los productos: %s", str(e))
+        logger.error("Error obteniendo productos: %s", str(e))
         return {
             'statusCode': 500,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,
             },
-            'body': json.dumps({
-                'error': f'Error obteniendo los productos: {str(e)}'
-            })
+            'body': json.dumps({'error': f'Error obteniendo productos: {str(e)}'})
         }
