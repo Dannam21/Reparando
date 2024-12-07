@@ -66,7 +66,7 @@ def lambda_handler(event, context):
         lambda_client = boto3.client('lambda')
         
         img_object = {
-            'object_name': item['img'],
+            'object_name': item['img'],  # Se asume que 'img' es el nombre del objeto en S3
         }
 
         invoke_obtener_url = lambda_client.invoke(
@@ -78,7 +78,7 @@ def lambda_handler(event, context):
         response_url = json.loads(invoke_obtener_url['Payload'].read().decode())
         logger.info("Image upload response: %s", response_url)
 
-        if response_url['statusCode'] != 200:
+        if response_url.get('statusCode') != 200:
             return {
                 'statusCode': 500,
                 'headers':{
@@ -90,7 +90,8 @@ def lambda_handler(event, context):
                 })
             }
 
-        item['url_img']=response_url['url']
+        # Aquí agregamos la URL obtenida de la respuesta
+        item['url_img'] = response_url['url']
 
         return {
             'statusCode': 200,
@@ -98,7 +99,7 @@ def lambda_handler(event, context):
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': True, 
                 },
-            'body': json.dumps({'producto': item}, default=decimal_default)  # Aquí se usa decimal_default
+            'body': json.dumps({'producto': item}, default=decimal_default)  # Usamos decimal_default para serializar Decimal
         }
 
     except Exception as e:
