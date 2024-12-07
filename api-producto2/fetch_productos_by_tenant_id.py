@@ -36,7 +36,7 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True,
+                    'Access-Control-Allow-Credentials': True, 
                 },
                 'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
             }
@@ -56,14 +56,16 @@ def lambda_handler(event, context):
                 'statusCode': 404,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True,
+                    'Access-Control-Allow-Credentials': True, 
                 },
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
-        # Invocar otra Lambda para obtener la URL de la imagen
+        # Invocar la Lambda para obtener la URL de la imagen
         lambda_client = boto3.client('lambda')
-        img_object = {'object_name': item['img']}
+        img_object = {
+            'object_name': item['img'],
+        }
 
         invoke_obtener_url = lambda_client.invoke(
             FunctionName=OBTENER_URL_LAMBDA_NAME,
@@ -79,22 +81,22 @@ def lambda_handler(event, context):
                 'statusCode': 500,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': True,
+                    'Access-Control-Allow-Credentials': True, 
                 },
                 'body': json.dumps({
-                    'error': f'Error al obtener imagen: {response_url.get("error", "Error desconocido")}'
+                    'error': 'Error al obtener imagen'
                 })
             }
 
-        # Agregar la URL de la imagen al producto
+        # Agregar la URL de la imagen al item
         item['url_img'] = response_url['url']
 
-        # Retornar el producto con conversión de Decimal a float
+        # Retornar el producto con formato requerido
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Credentials': True, 
             },
             'body': json.dumps({'producto': item}, default=decimal_default)
         }
@@ -105,7 +107,7 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Credentials': True, 
             },
             'body': json.dumps({'error': f'Error obteniendo el producto: {str(e)}'})
         }
