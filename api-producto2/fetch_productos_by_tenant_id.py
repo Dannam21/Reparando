@@ -61,10 +61,22 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
+        # Verificar si existe el campo 'img' en el producto
+        img_object = item.get('img')
+        if not img_object:
+            return {
+                'statusCode': 404,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
+                'body': json.dumps({'error': 'Imagen no encontrada para el producto'})
+            }
+
         # Invocar la Lambda para obtener la URL de la imagen
         lambda_client = boto3.client('lambda')
         img_object = {
-            'object_name': item['img'],
+            'object_name': img_object,
         }
 
         invoke_obtener_url = lambda_client.invoke(
@@ -76,7 +88,7 @@ def lambda_handler(event, context):
         response_url = json.loads(invoke_obtener_url['Payload'].read().decode())
         logger.info("Image upload response: %s", response_url)
 
-        if response_url['statusCode'] != 200:
+        if response_url.get('statusCode') != 200:
             return {
                 'statusCode': 500,
                 'headers': {
@@ -88,8 +100,20 @@ def lambda_handler(event, context):
                 })
             }
 
-        # La URL que queremos incluir debe ser la URL completa con el parámetro de firma
-        item['url_img'] = response_url['url']  # Suponiendo que esta URL contiene la firma de acceso
+        # Asegurarse de que la URL esté presente en la respuesta de la Lambda
+        url_img = response_url.get('url')
+        if not url_img:
+            return {
+                'statusCode': 500,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
+                'body': json.dumps({'error': 'URL de imagen no encontrada en la respuesta de la Lambda'})
+            }
+
+        # Agregar la URL de la imagen a la respuesta
+        item['url_img'] = url_img
 
         # Formatear el objeto de respuesta según el formato exacto requerido
         response_body = {
