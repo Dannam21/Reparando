@@ -39,6 +39,16 @@ functions:
           integration: lambda
     name: ${self:service}-${opt:stage, 'dev'}-crear-proyecto
 
+  GetResenia:
+    handler: get_resenia.getResenia
+    events:
+      - http:
+          path: /resenia
+          method: get
+          cors: true
+          integration: lambda
+    name: ${self:service}-${opt:stage, 'dev'}-get-resenia
+
 resources:
   Resources:
     TablaResenias:
